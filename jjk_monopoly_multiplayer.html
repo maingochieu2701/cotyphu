@@ -1,0 +1,788 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a0a12;--ink2:#13131f;--gold:#c9a84c;--gold2:#f0c040;
+  --red:#c0392b;--purple:#6c3483;--blue:#1a3a5c;--teal:#0d6e56;
+  --pink:#8b2252;--orange:#8b3a0f;--yellow:#8b6a0f;--green:#1a4a1a;
+}
+body,#R{font-family:'Cinzel',serif;background:#0a0a12;color:#f5f0e8}
+#R{padding:12px;border-radius:16px;max-width:960px;margin:0 auto}
+
+.scr{display:none}
+.scr.on{display:block}
+.scr.flex.on{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:520px}
+
+/* LOBBY */
+.logo{text-align:center;padding:1.5rem 0 1rem}
+.logo .k{font-size:28px;letter-spacing:6px;color:var(--gold);font-weight:700}
+.logo .s{font-size:9px;letter-spacing:.4em;color:#c9a84c66;margin-top:4px}
+.logo .bar{width:100px;height:2px;background:var(--gold);margin:8px auto 0;position:relative}
+.logo .bar::before,.logo .bar::after{content:'';position:absolute;width:5px;height:5px;background:var(--gold);border-radius:50%;top:-1.5px}
+.logo .bar::before{left:-7px}.logo .bar::after{right:-7px}
+
+.card{background:#13131f;border:1px solid #c9a84c33;border-radius:12px;padding:1.25rem;margin-bottom:10px}
+.clabel{font-size:8px;letter-spacing:.35em;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:10px}
+
+.char-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.char-card{
+  border:1.5px solid #c9a84c22;border-radius:10px;
+  background:#0a0a12;padding:8px 4px;
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;transition:all .15s;gap:4px;
+}
+.char-card:hover{border-color:#c9a84c55;background:#13131f}
+.char-card.sel{border-color:var(--gold);background:#1a1500}
+.char-card.taken{opacity:.35;cursor:not-allowed}
+.char-name{font-size:9px;color:#d4cdb5;text-align:center;letter-spacing:.05em;font-weight:600}
+.char-role{font-size:7px;color:#c9a84c88;text-align:center}
+
+.ninput{
+  width:100%;padding:9px 12px;
+  background:#0a0a12;border:1px solid #c9a84c44;
+  border-radius:8px;color:#f5f0e8;font-size:13px;
+  font-family:'Cinzel',serif;outline:none;margin-bottom:10px;
+}
+.ninput:focus{border-color:var(--gold)}
+
+.gbtn{
+  width:100%;padding:11px;background:var(--gold);color:#0a0a12;
+  border:none;border-radius:9px;font-size:11px;font-weight:700;
+  letter-spacing:.2em;font-family:'Cinzel',serif;cursor:pointer;
+  text-transform:uppercase;transition:background .15s;
+}
+.gbtn:hover{background:var(--gold2)}
+.gbtn:disabled{background:#2a2a3a;color:#555;cursor:not-allowed}
+.gbtn.outline{background:transparent;color:var(--gold);border:1px solid var(--gold)44;margin-top:6px}
+.gbtn.outline:hover{background:#1a1500;border-color:var(--gold)}
+
+.room-code-display{
+  text-align:center;padding:1.5rem;
+  background:#0a0a12;border:1px solid #c9a84c44;border-radius:10px;
+  margin-bottom:12px;
+}
+.rcode{font-size:32px;font-weight:700;color:var(--gold);letter-spacing:8px;font-family:'Cinzel',serif}
+.rcode-sub{font-size:9px;color:#c9a84c66;margin-top:6px;letter-spacing:.2em}
+
+.lobby-players{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.lp-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:8px;
+  border:1px solid #c9a84c22;background:#0a0a12;
+}
+.lp-row.ready{border-color:var(--gold);background:#1a1500}
+.lp-name{flex:1;font-size:12px;color:#d4cdb5;font-family:'Cinzel',serif}
+.lp-status{font-size:9px;letter-spacing:.15em;color:#c9a84c88}
+.lp-status.ready{color:var(--gold)}
+.waiting-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:#c9a84c44;animation:pulse 1.2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* GAME */
+.gw{display:grid;grid-template-columns:1fr 270px;gap:10px}
+@media(max-width:660px){.gw{grid-template-columns:1fr}}
+
+.board-outer{
+  background:#13131f;border:1px solid #c9a84c33;
+  border-radius:14px;padding:8px;aspect-ratio:1;overflow:hidden;
+}
+.board{
+  display:grid;grid-template-columns:repeat(11,1fr);
+  grid-template-rows:repeat(11,1fr);gap:1px;width:100%;height:100%;
+}
+.cell{
+  background:#0e0e1c;border:1px solid #c9a84c1a;border-radius:2px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;overflow:hidden;position:relative;
+}
+.cell:hover{background:#1a1a2e}
+.cbar{width:100%;height:5px;flex-shrink:0}
+.cname{
+  font-size:5.5px;line-height:1.3;font-weight:600;color:#d4cdb5;
+  padding:1px 2px;text-align:center;width:100%;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+}
+.cprice{font-size:5px;color:var(--gold);padding-bottom:1px}
+.cell.corner{background:#1a0a0a}
+.cell.special{background:#0a0e1a}
+.center-cell{
+  grid-column:2/11;grid-row:2/11;background:#0a0a12;
+  border:1px solid #c9a84c22;border-radius:6px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.cc-ring{position:absolute;border:1px solid #c9a84c18;border-radius:50%}
+.cc-kanji{font-size:18px;letter-spacing:3px;color:var(--gold);font-weight:700;z-index:1}
+.cc-en{font-size:6.5px;letter-spacing:.25em;color:#c9a84c55;margin-top:3px;z-index:1}
+.tok-layer{position:absolute;bottom:1px;left:0;right:0;display:flex;flex-wrap:wrap;justify-content:center;gap:0;z-index:3}
+.own-flag{position:absolute;top:1px;right:1px;width:5px;height:5px;border-radius:50%;z-index:2}
+
+/* PANEL */
+.panel{display:flex;flex-direction:column;gap:8px}
+.pcard{background:#13131f;border:1px solid #c9a84c22;border-radius:12px;padding:10px}
+.plabel{font-size:8px;letter-spacing:.35em;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:8px}
+
+.turn-banner{
+  background:#13131f;border:1px solid #c9a84c55;border-radius:12px;
+  padding:10px 12px;display:flex;align-items:center;gap:10px;
+}
+.tb-char{flex-shrink:0}
+.tb-info{}
+.tb-name{font-size:13px;font-weight:700;color:var(--gold2);font-family:'Cinzel',serif}
+.tb-sub{font-size:9px;color:#c9a84c88;letter-spacing:.1em}
+.my-turn-pulse{animation:turnPulse 2s infinite}
+@keyframes turnPulse{0%,100%{border-color:#c9a84c55}50%{border-color:var(--gold)}}
+
+.pstrip{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 8px;border-radius:7px;
+  border:1px solid #c9a84c1a;margin-bottom:5px;
+  transition:all .15s;
+}
+.pstrip.active{border-color:var(--gold);background:#1a1500}
+.pstrip.bk{opacity:.3}
+.pstrip.me{border-color:#c9a84c44}
+.ps-info{flex:1;min-width:0}
+.ps-name{font-size:11px;font-weight:700;color:#d4cdb5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps-pos{font-size:9px;color:#c9a84c66}
+.ps-m{font-size:11px;font-weight:700;color:var(--gold)}
+
+.dice-wrap{display:flex;gap:10px;justify-content:center;margin:6px 0 10px}
+.die{
+  width:42px;height:42px;border-radius:9px;
+  background:#0a0a12;border:1px solid #c9a84c44;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:var(--gold2);
+}
+.die.roll{animation:diceAnim .4s ease}
+@keyframes diceAnim{0%,100%{transform:scale(1)}30%{transform:scale(1.15) rotate(-10deg)}60%{transform:scale(.95) rotate(6deg)}}
+
+.logbox{max-height:140px;overflow-y:auto;font-size:9.5px;line-height:1.8;color:#8a8470}
+.logbox::-webkit-scrollbar{width:2px}
+.logbox::-webkit-scrollbar-thumb{background:#c9a84c22}
+.lentry{padding:1px 0;border-bottom:1px solid #ffffff08}
+.lentry.hi{color:var(--gold);font-weight:600}
+
+.notif{
+  padding:8px 12px;border-radius:8px;
+  background:#1a1500;border:1px solid #c9a84c44;
+  font-size:10px;color:var(--gold);letter-spacing:.1em;
+  text-align:center;margin-bottom:6px;display:none;
+}
+.notif.show{display:block}
+
+/* MODAL */
+#mwrap{
+  display:none;min-height:440px;background:rgba(0,0,0,.8);
+  border-radius:12px;align-items:center;justify-content:center;padding:20px;
+}
+#mwrap.open{display:flex}
+.modal{
+  background:#13131f;border:1px solid #c9a84c55;
+  border-radius:14px;padding:1.5rem;max-width:300px;width:100%;
+}
+.mbar{height:5px;border-radius:3px;margin-bottom:12px}
+.modal h3{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:.08em}
+.mstat{display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid #ffffff08}
+.mstat:last-of-type{border-bottom:none;margin-bottom:8px}
+.mstat span:first-child{color:#8a8470}
+.mstat span:last-child{color:#d4cdb5;font-weight:600}
+.modal p{font-size:10px;color:#8a8470;line-height:1.6;margin:8px 0}
+.mbtns{display:flex;gap:8px;margin-top:10px}
+.mbtn{
+  flex:1;padding:9px;border-radius:8px;font-size:9px;font-weight:700;
+  letter-spacing:.15em;font-family:'Cinzel',serif;cursor:pointer;
+  text-transform:uppercase;border:1px solid #c9a84c33;
+  background:#0a0a12;color:#8a8470;transition:all .15s;
+}
+.mbtn:hover{border-color:var(--gold);color:var(--gold)}
+.mbtn.p{background:var(--gold);color:#0a0a12;border-color:var(--gold)}
+.mbtn.p:hover{background:var(--gold2)}
+.mbtn:disabled{opacity:.3;cursor:not-allowed}
+
+/* WINNER */
+#wscr{display:none;text-align:center;padding:3rem 1rem}
+.wseal{
+  width:90px;height:90px;border-radius:50%;
+  background:#1a1500;border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;
+}
+.wt{font-size:9px;letter-spacing:.4em;color:#c9a84c66;margin-bottom:8px;text-transform:uppercase}
+.wname{font-size:22px;font-weight:700;color:var(--gold);font-family:'Cinzel',serif;margin-bottom:4px}
+.wmoney{font-size:15px;color:var(--gold2);margin-bottom:20px}
+.wdeco{width:60px;height:1px;background:var(--gold);margin:0 auto 20px}
+</style>
+
+<div id="R">
+
+<!-- LOBBY -->
+<div id="s-lobby" class="scr on">
+  <div class="logo">
+    <div class="k">呪術廻戦</div>
+    <div class="s">Jujutsu Kaisen · Multiplayer Monopoly</div>
+    <div class="bar"></div>
+  </div>
+  <div class="card">
+    <div class="clabel">Tên của bạn</div>
+    <input class="ninput" id="myName" placeholder="Nhập tên chiến binh..." maxlength="16"/>
+    <div class="clabel">Chọn nhân vật</div>
+    <div class="char-grid" id="charGrid"></div>
+  </div>
+  <div class="card">
+    <div class="clabel">Tạo phòng mới</div>
+    <button class="gbtn" id="createBtn">Tạo phòng</button>
+    <div style="margin:12px 0;text-align:center;font-size:9px;color:#c9a84c44;letter-spacing:.2em">— HOẶC —</div>
+    <div class="clabel">Vào phòng có sẵn</div>
+    <input class="ninput" id="roomInput" placeholder="Nhập mã phòng (4 chữ số)..." maxlength="4" style="text-align:center;font-size:18px;letter-spacing:6px"/>
+    <button class="gbtn outline" id="joinBtn">Vào phòng</button>
+  </div>
+</div>
+
+<!-- WAITING ROOM -->
+<div id="s-wait" class="scr">
+  <div class="logo"><div class="k">呪術廻戦</div><div class="bar"></div></div>
+  <div class="card">
+    <div class="clabel">Mã phòng</div>
+    <div class="room-code-display">
+      <div class="rcode" id="roomCodeDisplay">——</div>
+      <div class="rcode-sub">Chia sẻ mã này cho bạn bè · 2–4 người</div>
+    </div>
+    <div class="clabel">Chiến binh trong phòng</div>
+    <div class="lobby-players" id="lobbyPlayers"></div>
+    <button class="gbtn" id="startGameBtn" style="display:none">Khai chiến!</button>
+    <div id="waitMsg" style="text-align:center;font-size:10px;color:#c9a84c88;letter-spacing:.15em;padding:8px 0">Chờ thêm chiến binh tham gia...</div>
+  </div>
+  <button class="gbtn outline" onclick="location.reload()">Thoát phòng</button>
+</div>
+
+<!-- GAME -->
+<div id="s-game" class="scr">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px">
+    <div style="font-size:9px;letter-spacing:.3em;color:#c9a84c55">呪術廻戦 MONOPOLY</div>
+    <div id="roomTag" style="font-size:9px;color:#c9a84c55;letter-spacing:.15em"></div>
+  </div>
+  <div class="notif" id="notif"></div>
+  <div class="gw">
+    <div class="board-outer"><div class="board" id="board"></div></div>
+    <div class="panel">
+      <div class="turn-banner" id="turnBanner">
+        <div class="tb-char" id="tbChar"></div>
+        <div class="tb-info">
+          <div class="tb-name" id="tbName">—</div>
+          <div class="tb-sub" id="tbSub">—</div>
+        </div>
+      </div>
+      <div class="pcard"><div class="plabel">Chiến binh</div><div id="pInfo"></div></div>
+      <div class="pcard">
+        <div class="dice-wrap"><div class="die" id="d1">⚀</div><div class="die" id="d2">⚁</div></div>
+        <button class="gbtn" id="rollBtn">Tung nguyền cốt</button>
+        <button class="gbtn outline" id="endBtn" style="display:none">Kết thúc lượt →</button>
+      </div>
+      <div class="pcard"><div class="plabel">Nhật ký</div><div class="logbox" id="logBox"></div></div>
+    </div>
+  </div>
+  <div id="mwrap"><div class="modal">
+    <div class="mbar" id="mbar"></div>
+    <h3 id="mtitle"></h3>
+    <div id="mstats"></div>
+    <p id="mbody"></p>
+    <div class="mbtns" id="mbtns"></div>
+  </div></div>
+  <div id="wscr">
+    <div class="wseal" id="wchar"></div>
+    <div class="wt">Vương Giả Nguyền Thuật</div>
+    <div class="wname" id="wname"></div>
+    <div class="wmoney" id="wmoney"></div>
+    <div class="wdeco"></div>
+    <button class="gbtn" onclick="location.reload()">Chơi lại</button>
+  </div>
+</div>
+</div>
+
+<script>
+const CHARS=[
+  {id:'yuji',name:'Yuji Itadori',role:'Đặc cấp lớp 1',color:'#c0392b',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="8" fill="#e8c8a0"/><rect x="10" y="20" width="16" height="12" rx="3" fill="#c0392b"/><circle cx="14" cy="11" r="1.5" fill="#2c1810"/><circle cx="22" cy="11" r="1.5" fill="#2c1810"/><path d="M15 15 Q18 17 21 15" stroke="#8b4513" stroke-width="1" fill="none"/><rect x="12" y="20" width="5" height="8" rx="2" fill="#8b0000"/><rect x="19" y="20" width="5" height="8" rx="2" fill="#8b0000"/><path d="M13 9 Q18 6 23 9" stroke="#3d2b1f" stroke-width="1.5" fill="none"/><circle cx="18" cy="8" r="2" fill="#3d2b1f"/></svg>`},
+  {id:'megumi',name:'Megumi Fushiguro',role:'Đặc cấp lớp 1',color:'#1a3a5c',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="8" fill="#d4b896"/><rect x="10" y="20" width="16" height="12" rx="3" fill="#1a1a2e"/><circle cx="14" cy="11" r="1.5" fill="#1a1a2e"/><circle cx="22" cy="11" r="1.5" fill="#1a1a2e"/><path d="M15 15 Q18 14 21 15" stroke="#8b4513" stroke-width="1" fill="none"/><rect x="12" y="20" width="5" height="8" rx="2" fill="#0d0d1a"/><rect x="19" y="20" width="5" height="8" rx="2" fill="#0d0d1a"/><path d="M12 10 L16 8 M20 8 L24 10" stroke="#1a1a2e" stroke-width="2" fill="none"/></svg>`},
+  {id:'nobara',name:'Nobara Kugisaki',role:'Đặc cấp lớp 1',color:'#8b2252',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="8" fill="#f0d0a0"/><rect x="10" y="20" width="16" height="12" rx="3" fill="#8b2252"/><circle cx="14" cy="11" r="1.5" fill="#2c1810"/><circle cx="22" cy="11" r="1.5" fill="#2c1810"/><path d="M15 15 Q18 17 21 15" stroke="#8b4513" stroke-width="1" fill="none"/><rect x="12" y="20" width="5" height="8" rx="2" fill="#6b1040"/><rect x="19" y="20" width="5" height="8" rx="2" fill="#6b1040"/><path d="M12 8 Q15 5 18 7 Q21 5 24 8" stroke="#c0392b" stroke-width="1.5" fill="none"/><circle cx="15" cy="7" r="2" fill="#f0c040"/><circle cx="21" cy="7" r="2" fill="#f0c040"/></svg>`},
+  {id:'gojo',name:'Satoru Gojo',role:'Đặc cấp lớp S',color:'#ffffff',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="8" fill="#f5f0e8"/><rect x="10" y="20" width="16" height="12" rx="3" fill="#f5f0e8"/><circle cx="14" cy="11" r="2" fill="#4fc3f7"/><circle cx="22" cy="11" r="2" fill="#4fc3f7"/><circle cx="14" cy="11" r="1" fill="#0288d1"/><circle cx="22" cy="11" r="1" fill="#0288d1"/><path d="M15 15 Q18 17 21 15" stroke="#8b4513" stroke-width="1" fill="none"/><rect x="12" y="20" width="5" height="8" rx="2" fill="#e0e0e0"/><rect x="19" y="20" width="5" height="8" rx="2" fill="#e0e0e0"/><rect x="11" y="9" width="14" height="4" rx="6" fill="none" stroke="#b0bec5" stroke-width="1"/><path d="M13 8 Q18 5 23 8" stroke="#b0bec5" stroke-width="1.5" fill="none"/></svg>`},
+  {id:'nanami',name:'Kento Nanami',role:'Đặc cấp lớp 1',color:'#8b6a0f',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="8" fill="#d4b896"/><rect x="10" y="20" width="16" height="12" rx="3" fill="#5a4a20"/><circle cx="14" cy="11" r="1.5" fill="#2c1810"/><circle cx="22" cy="11" r="1.5" fill="#2c1810"/><path d="M15 14 Q18 13 21 14" stroke="#8b4513" stroke-width="1" fill="none"/><rect x="12" y="20" width="5" height="8" rx="2" fill="#3a3010"/><rect x="19" y="20" width="5" height="8" rx="2" fill="#3a3010"/><rect x="11" y="9" width="14" height="3" rx="0" fill="#3d3010"/><path d="M11 9 L25 9" stroke="#c9a84c" stroke-width=".5"/></svg>`},
+  {id:'sukuna',name:'Ryomen Sukuna',role:'Vương Nguyền',color:'#8b0000',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="8" fill="#c8a090"/><rect x="10" y="20" width="16" height="12" rx="3" fill="#6b0000"/><circle cx="13" cy="10" r="1.5" fill="#8b0000"/><circle cx="23" cy="10" r="1.5" fill="#8b0000"/><circle cx="13" cy="14" r="1" fill="#8b0000"/><circle cx="23" cy="14" r="1" fill="#8b0000"/><path d="M15 16 Q18 15 21 16" stroke="#8b0000" stroke-width="1.2" fill="none"/><rect x="12" y="20" width="5" height="8" rx="2" fill="#4a0000"/><rect x="19" y="20" width="5" height="8" rx="2" fill="#4a0000"/><path d="M14 8 L12 6 M22 8 L24 6 M18 7 L18 4" stroke="#8b0000" stroke-width="1.2"/><path d="M12 12 L10 11 M24 12 L26 11" stroke="#c9a84c" stroke-width="1"/></svg>`},
+  {id:'todo',name:'Aoi Todo',role:'Đặc cấp lớp 1',color:'#1a4a1a',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="9" fill="#c8a878"/><rect x="9" y="20" width="18" height="12" rx="3" fill="#1a4a1a"/><circle cx="14" cy="11" r="1.8" fill="#1a1a1a"/><circle cx="22" cy="11" r="1.8" fill="#1a1a1a"/><path d="M15 16 Q18 18 21 16" stroke="#8b4513" stroke-width="1.2" fill="none"/><rect x="10" y="20" width="7" height="8" rx="2" fill="#0a2a0a"/><rect x="19" y="20" width="7" height="8" rx="2" fill="#0a2a0a"/><path d="M11 9 Q18 5 25 9" stroke="#1a1a1a" stroke-width="2" fill="none"/></svg>`},
+  {id:'choso',name:'Choso',role:'Nguyền linh cấp đặc biệt',color:'#0d6e56',
+   svg:`<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="12" r="8" fill="#d0b8b0"/><rect x="10" y="20" width="16" height="12" rx="3" fill="#1a1a2e"/><circle cx="14" cy="11" r="1.5" fill="#8b0000"/><circle cx="22" cy="11" r="1.5" fill="#8b0000"/><path d="M15 15 Q18 14 21 15" stroke="#8b0000" stroke-width="1" fill="none"/><rect x="12" y="20" width="5" height="8" rx="2" fill="#0d0d1a"/><rect x="19" y="20" width="5" height="8" rx="2" fill="#0d0d1a"/><line x1="10" y1="10" x2="26" y2="10" stroke="#8b0000" stroke-width="1.5"/><line x1="10" y1="13" x2="26" y2="13" stroke="#8b0000" stroke-width=".8"/></svg>`},
+];
+
+const CM={purple:'#6c3483',blue:'#1a3a5c',teal:'#0d6e56',red:'#c0392b',orange:'#8b3a0f',yellow:'#8b6a0f',green:'#1a4a1a',pink:'#8b2252',brown:'#5a3010'};
+const PROPS=[
+  {id:1,name:'HV Tokyo',price:60,rent:[2,10,30,90,160,250],color:'purple',group:0},
+  {id:3,name:'HV Kyoto',price:60,rent:[4,20,60,180,320,450],color:'purple',group:0},
+  {id:6,name:'Ngục Geto',price:100,rent:[6,30,90,270,400,550],color:'teal',group:1},
+  {id:8,name:'Địa Geto',price:100,rent:[6,30,90,270,400,550],color:'teal',group:1},
+  {id:9,name:'Phố Okkotsu',price:120,rent:[8,40,100,300,450,600],color:'teal',group:1},
+  {id:11,name:'Shibuya',price:140,rent:[10,50,150,450,625,750],color:'pink',group:2},
+  {id:13,name:'Nhà Haibara',price:140,rent:[10,50,150,450,625,750],color:'pink',group:2},
+  {id:14,name:'Tháp Todo',price:160,rent:[12,60,180,500,700,900],color:'pink',group:2},
+  {id:16,name:'Địa Nanami',price:180,rent:[14,70,200,550,750,950],color:'orange',group:3},
+  {id:18,name:'Xưởng Cursed',price:180,rent:[14,70,200,550,750,950],color:'orange',group:3},
+  {id:19,name:'Cổng Mei Mei',price:200,rent:[16,80,220,600,800,1000],color:'orange',group:3},
+  {id:21,name:'Địa Choso',price:220,rent:[18,90,250,700,875,1050],color:'red',group:4},
+  {id:23,name:'Hang Mahito',price:220,rent:[18,90,250,700,875,1050],color:'red',group:4},
+  {id:24,name:'Núi Jogo',price:240,rent:[20,100,300,750,925,1100],color:'red',group:4},
+  {id:26,name:'Vùng Mechamaru',price:260,rent:[22,110,330,800,975,1150],color:'yellow',group:5},
+  {id:27,name:'Đảo Dagon',price:260,rent:[22,110,330,800,975,1150],color:'yellow',group:5},
+  {id:29,name:'Trường Hakari',price:280,rent:[24,120,360,850,1025,1200],color:'yellow',group:5},
+  {id:31,name:'Thành Sendai',price:300,rent:[26,130,390,900,1100,1275],color:'green',group:6},
+  {id:32,name:'Khu Yuji',price:300,rent:[26,130,390,900,1100,1275],color:'green',group:6},
+  {id:34,name:'Cung Megumi',price:320,rent:[28,150,450,1000,1200,1400],color:'green',group:6},
+  {id:37,name:'Nobara',price:350,rent:[35,175,500,1100,1300,1500],color:'blue',group:7},
+  {id:39,name:'Sukuna',price:400,rent:[50,200,600,1400,1700,2000],color:'blue',group:7},
+];
+const RAILS=[{id:5,name:'JR Jujutsu',price:200,baseRent:25,type:'railroad'},{id:15,name:'Shibuya Metro',price:200,baseRent:25,type:'railroad'},{id:25,name:'Cursed Rail',price:200,baseRent:25,type:'railroad'},{id:35,name:'Sukuna Line',price:200,baseRent:25,type:'railroad'}];
+const UTILS=[{id:12,name:'Thủy pháp',price:150,type:'utility'},{id:28,name:'Hỏa pháp',price:150,type:'utility'}];
+const SP={0:{name:'Xuất phát',icon:'✦',type:'go'},2:{name:'Rương Nguyền',icon:'卍',type:'cc'},4:{name:'Thuế Nguyền',icon:'¥',type:'tax',amount:200},7:{name:'Rương Nguyền',icon:'卍',type:'cc'},10:{name:'Thăm Ngục',icon:'⛩',type:'jv'},17:{name:'Rương Nguyền',icon:'卍',type:'cc'},20:{name:'Công Viên',icon:'✿',type:'park'},22:{name:'Rương Nguyền',icon:'卍',type:'cc'},30:{name:'Vào Tù!',icon:'鬼',type:'gj'},33:{name:'Rương Nguyền',icon:'卍',type:'cc'},36:{name:'Rương Nguyền',icon:'卍',type:'cc'},38:{name:'Thuế Xa Xỉ',icon:'¥',type:'tax',amount:100}};
+const CC=[{t:'Gojo phá ấn — nhận 200¥',f:'200'},{t:'Yuji ăn ngón tay — nhận 50¥',f:'50'},{t:'Nanami ngoài giờ — nhận 100¥',f:'100'},{t:'Nobara gặp nguyền — trả 50¥',f:'-50'},{t:'Megumi triệu hồi — nhận 150¥',f:'150'},{t:'Sửa Domain — trả 150¥',f:'-150'},{t:'Thắng giải đấu — nhận 200¥',f:'200'},{t:'Ryomen tấn công — trả 100¥',f:'-100'}];
+
+function buildCells(){
+  const c=[];
+  for(let i=0;i<40;i++){
+    const p=PROPS.find(x=>x.id===i),r=RAILS.find(x=>x.id===i),u=UTILS.find(x=>x.id===i),s=SP[i];
+    if(p) c[i]={...p,type:'property',owner:null,houses:0};
+    else if(r) c[i]={...r,owner:null};
+    else if(u) c[i]={...u,owner:null};
+    else if(s) c[i]={...s};
+    else c[i]={id:i,name:`Ô ${i}`,type:'blank'};
+  }
+  return c;
+}
+
+// STATE
+let myId=null,roomCode=null,myChar=null,myName='';
+let gameState=null;
+let pollTimer=null;
+const d6=()=>Math.floor(Math.random()*6)+1;
+
+// CHAR SELECT
+const cg=document.getElementById('charGrid');
+CHARS.forEach(ch=>{
+  const el=document.createElement('div');
+  el.className='char-card';el.dataset.id=ch.id;
+  el.innerHTML=`${ch.svg}<div class="char-name">${ch.name.split(' ')[0]}</div><div class="char-role">${ch.role}</div>`;
+  el.onclick=()=>{
+    if(el.classList.contains('taken'))return;
+    document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');myChar=ch.id;
+  };
+  cg.appendChild(el);
+});
+
+function getChar(id){return CHARS.find(c=>c.id===id)||CHARS[0]}
+
+// STORAGE HELPERS
+async function saveRoom(code,data){
+  try{await window.storage.set('room:'+code,JSON.stringify(data),true);}catch(e){}
+}
+async function loadRoom(code){
+  try{const r=await window.storage.get('room:'+code,true);return r?JSON.parse(r.value):null;}catch(e){return null;}
+}
+async function delRoom(code){
+  try{await window.storage.delete('room:'+code,true);}catch(e){}
+}
+
+function genCode(){return String(Math.floor(1000+Math.random()*9000))}
+function genId(){return Math.random().toString(36).slice(2,8)}
+
+// CREATE ROOM
+document.getElementById('createBtn').onclick=async()=>{
+  myName=document.getElementById('myName').value.trim()||'Chiến binh';
+  if(!myChar){showNotif('Hãy chọn nhân vật!');return;}
+  myId=genId();
+  roomCode=genCode();
+  const ch=getChar(myChar);
+  const state={
+    phase:'lobby',
+    players:[{id:myId,name:myName,charId:myChar,color:ch.color,money:1500,pos:0,jail:false,jailTurns:0,bankrupt:false,isHost:true}],
+    cells:buildCells(),
+    cur:0,hasRolled:false,dblCount:0,ccIdx:0,
+    log:[],lastUpdate:Date.now()
+  };
+  await saveRoom(roomCode,state);
+  gameState=state;
+  showWaiting();
+};
+
+// JOIN ROOM
+document.getElementById('joinBtn').onclick=async()=>{
+  myName=document.getElementById('myName').value.trim()||'Chiến binh';
+  if(!myChar){showNotif('Hãy chọn nhân vật!');return;}
+  const code=document.getElementById('roomInput').value.trim();
+  if(code.length!==4){showNotif('Mã phòng phải 4 chữ số!');return;}
+  const state=await loadRoom(code);
+  if(!state){showNotif('Không tìm thấy phòng! Kiểm tra lại mã.');return;}
+  if(state.phase!=='lobby'){showNotif('Phòng đã bắt đầu trận chiến rồi!');return;}
+  if(state.players.length>=4){showNotif('Phòng đã đầy (tối đa 4 người)!');return;}
+  const taken=state.players.map(p=>p.charId);
+  if(taken.includes(myChar)){showNotif('Nhân vật này đã được chọn! Hãy chọn nhân vật khác.');return;}
+  myId=genId();roomCode=code;
+  const ch=getChar(myChar);
+  state.players.push({id:myId,name:myName,charId:myChar,color:ch.color,money:1500,pos:0,jail:false,jailTurns:0,bankrupt:false,isHost:false});
+  state.lastUpdate=Date.now();
+  await saveRoom(code,state);
+  gameState=state;
+  showWaiting();
+};
+
+function showNotif(msg){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+function showWaiting(){
+  document.getElementById('s-lobby').classList.remove('on');
+  document.getElementById('s-wait').classList.add('on');
+  document.getElementById('roomCodeDisplay').textContent=roomCode;
+  document.getElementById('roomTag').textContent='Phòng: '+roomCode;
+  renderLobby();
+  startPoll();
+}
+
+function renderLobby(){
+  if(!gameState)return;
+  const lp=document.getElementById('lobbyPlayers');
+  lp.innerHTML='';
+  const amHost=gameState.players.find(p=>p.id===myId)?.isHost;
+  gameState.players.forEach(p=>{
+    const row=document.createElement('div');
+    row.className='lp-row'+(p.id===myId?' ready':'');
+    const ch=getChar(p.charId);
+    row.innerHTML=`<div style="flex-shrink:0">${ch.svg}</div>
+    <div class="lp-name">${p.name}${p.isHost?' ✦':''}</div>
+    <div class="lp-status ready">${p.id===myId?'Bạn':'Đã vào'}</div>`;
+    lp.appendChild(row);
+  });
+  const sb=document.getElementById('startGameBtn');
+  const wm=document.getElementById('waitMsg');
+  if(amHost&&gameState.players.length>=2){
+    sb.style.display='block';wm.style.display='none';
+  } else if(amHost){
+    sb.style.display='none';wm.style.display='block';
+    wm.textContent='Chờ thêm chiến binh tham gia... (cần ít nhất 2)';
+  } else {
+    sb.style.display='none';wm.style.display='block';
+    wm.textContent='Chờ host khai chiến...';
+  }
+}
+
+document.getElementById('startGameBtn').onclick=async()=>{
+  if(!gameState)return;
+  gameState.phase='game';gameState.lastUpdate=Date.now();
+  await saveRoom(roomCode,gameState);
+  startGame();
+};
+
+function startPoll(){
+  if(pollTimer)clearInterval(pollTimer);
+  pollTimer=setInterval(async()=>{
+    const fresh=await loadRoom(roomCode);
+    if(!fresh)return;
+    const changed=fresh.lastUpdate!==gameState?.lastUpdate;
+    gameState=fresh;
+    if(fresh.phase==='lobby'){
+      renderLobby();
+      const takenChars=fresh.players.filter(p=>p.id!==myId).map(p=>p.charId);
+      document.querySelectorAll('.char-card').forEach(el=>{
+        const taken2=takenChars.includes(el.dataset.id);
+        el.classList.toggle('taken',taken2);
+      });
+    } else if(fresh.phase==='game'&&document.getElementById('s-wait').classList.contains('on')){
+      startGame();
+    } else if(fresh.phase==='game'&&changed){
+      renderGame();
+    }
+  },2000);
+}
+
+function startGame(){
+  if(pollTimer)clearInterval(pollTimer);
+  document.getElementById('s-wait').classList.remove('on');
+  document.getElementById('s-game').classList.add('on');
+  document.getElementById('roomTag').textContent='Phòng '+roomCode;
+  renderGame();
+  pollTimer=setInterval(async()=>{
+    const fresh=await loadRoom(roomCode);
+    if(!fresh||fresh.lastUpdate===gameState?.lastUpdate)return;
+    gameState=fresh;
+    renderGame();
+  },1500);
+}
+
+const DF=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+
+function isMyTurn(){
+  if(!gameState)return false;
+  const cp=gameState.players[gameState.cur];
+  return cp&&cp.id===myId&&!cp.bankrupt;
+}
+
+function renderGame(){
+  if(!gameState)return;
+  if(gameState.phase==='ended'){showWinner2();return;}
+  drawBoard2();updatePanel2();
+  const rb=document.getElementById('rollBtn');
+  const eb=document.getElementById('endBtn');
+  if(isMyTurn()&&!gameState.hasRolled){
+    rb.disabled=false;eb.style.display='none';
+  } else if(isMyTurn()&&gameState.hasRolled){
+    rb.disabled=true;eb.style.display='block';
+  } else {
+    rb.disabled=true;eb.style.display='none';
+  }
+  const tb=document.getElementById('turnBanner');
+  tb.classList.toggle('my-turn-pulse',isMyTurn());
+}
+
+function drawBoard2(){
+  const gs=gameState;
+  const board=document.getElementById('board');
+  board.innerHTML='';
+  const placed=new Set();
+  for(let row=0;row<=10;row++){
+    for(let col=0;col<=10;col++){
+      if(row>=1&&row<=9&&col>=1&&col<=9){
+        if(row===1&&col===1){
+          const c=document.createElement('div');
+          c.className='center-cell';
+          c.style.cssText='grid-row:2/11;grid-column:2/11';
+          c.innerHTML=`<div class="cc-ring" style="width:80%;height:80%;left:10%;top:10%"></div>
+          <div class="cc-ring" style="width:55%;height:55%;left:22.5%;top:22.5%"></div>
+          <div style="width:22px;height:16px;border:1.5px solid #c9a84c44;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:3px;z-index:1"><div style="width:8px;height:8px;background:#c9a84c;border-radius:50%"></div></div>
+          <div class="cc-kanji">呪術廻戦</div><div class="cc-en">Monopoly</div>`;
+          board.appendChild(c);
+        }
+        continue;
+      }
+      let idx=-1;
+      if(row===10)idx=10-col;
+      else if(col===0&&row<10)idx=10+row;
+      else if(row===0)idx=20+col;
+      else if(col===10&&row>0)idx=30+row;
+      if(idx<0||idx>39||placed.has(idx))continue;
+      placed.add(idx);
+      const cd=gs.cells[idx];
+      const el=document.createElement('div');
+      el.className='cell'+(idx%10===0?' corner':'')+(cd.type==='cc'||cd.type==='tax'||cd.type==='park'||cd.type==='go'||cd.type==='jv'?' special':'');
+      el.style.cssText=`grid-row:${row+1};grid-column:${col+1}`;
+      const bar=document.createElement('div');bar.className='cbar';
+      bar.style.background=cd.color?CM[cd.color]:cd.type==='railroad'?'#2a2a2a':cd.type==='utility'?'#0d6e56':'transparent';
+      el.appendChild(bar);
+      if(cd.owner!=null){
+        const op=gs.players[cd.owner];
+        if(op){const f=document.createElement('div');f.className='own-flag';f.style.background=op.color;el.appendChild(f);}
+      }
+      const nm=document.createElement('div');nm.className='cname';
+      nm.textContent=(cd.icon?cd.icon+' ':'')+cd.name;el.appendChild(nm);
+      if(cd.price){const pr=document.createElement('div');pr.className='cprice';pr.textContent=cd.price+'¥';el.appendChild(pr);}
+      const tl=document.createElement('div');tl.className='tok-layer';
+      gs.players.filter(p=>p.pos===idx&&!p.bankrupt).forEach(p=>{
+        const ch=getChar(p.charId);
+        const wrapper=document.createElement('div');
+        wrapper.style.cssText='width:14px;height:14px;border-radius:50%;overflow:hidden;border:1px solid '+p.color+';flex-shrink:0;background:#0a0a12';
+        wrapper.innerHTML=`<svg viewBox="2 2 32 22" width="14" height="14">${ch.svg.replace('<svg width="36" height="36" viewBox="0 0 36 36">','').replace('</svg>','')}</svg>`;
+        wrapper.title=p.name;tl.appendChild(wrapper);
+      });
+      el.appendChild(tl);board.appendChild(el);
+    }
+  }
+}
+
+function updatePanel2(){
+  if(!gameState)return;
+  const gs=gameState;
+  const cp=gs.players[gs.cur];
+  const ch=cp?getChar(cp.charId):null;
+  document.getElementById('tbChar').innerHTML=ch?`<div style="width:40px;height:40px;border-radius:50%;border:1.5px solid #c9a84c55;overflow:hidden;background:#0a0a12;display:flex;align-items:center;justify-content:center">${ch.svg}</div>`:'';
+  document.getElementById('tbName').textContent=cp?cp.name+(cp.id===myId?' (Bạn)':''):'';
+  document.getElementById('tbSub').textContent=cp?.jail?'Trong ngục':isMyTurn()?'Lượt của bạn — hành động!':'Đang chờ...';
+
+  const pInfo=document.getElementById('pInfo');
+  pInfo.innerHTML='';
+  gs.players.forEach((p,i)=>{
+    const ch2=getChar(p.charId);
+    const s=document.createElement('div');
+    s.className='pstrip'+(i===gs.cur&&!p.bankrupt?' active':'')+(p.bankrupt?' bk':'')+(p.id===myId?' me':'');
+    s.innerHTML=`<div style="width:26px;height:26px;border-radius:50%;overflow:hidden;border:1px solid ${p.color};flex-shrink:0;background:#0a0a12">${ch2.svg.replace('width="36" height="36"','width="26" height="26"')}</div>
+    <div class="ps-info"><div class="ps-name">${p.name}${p.id===myId?' ★':''}</div><div class="ps-pos">${gs.cells[p.pos]?.name||'Xuất phát'}</div></div>
+    <div class="ps-m">${p.money.toLocaleString()}¥</div>`;
+    pInfo.appendChild(s);
+  });
+
+  const lb=document.getElementById('logBox');
+  lb.innerHTML='';
+  (gs.log||[]).slice().reverse().forEach(entry=>{
+    const e=document.createElement('div');e.className='lentry'+(entry.hi?' hi':'');
+    e.textContent=entry.t;lb.appendChild(e);
+  });
+
+  if(gs.lastDice){
+    document.getElementById('d1').textContent=DF[gs.lastDice[0]]||'?';
+    document.getElementById('d2').textContent=DF[gs.lastDice[1]]||'?';
+  }
+}
+
+document.getElementById('rollBtn').onclick=async()=>{
+  if(!isMyTurn()||gameState.hasRolled)return;
+  const gs=JSON.parse(JSON.stringify(gameState));
+  const p=gs.players[gs.cur];
+  const v1=d6(),v2=d6();
+  const isD=v1===v2;
+  gs.lastDice=[v1,v2];
+  document.getElementById('d1').classList.add('roll');
+  document.getElementById('d2').classList.add('roll');
+  setTimeout(()=>{document.getElementById('d1').classList.remove('roll');document.getElementById('d2').classList.remove('roll');},400);
+  document.getElementById('d1').textContent=DF[v1];document.getElementById('d2').textContent=DF[v2];
+  if(isD) gs.dblCount=(gs.dblCount||0)+1; else gs.dblCount=0;
+  addLog(gs,`${p.name} tung ${v1}+${v2}=${v1+v2}${isD?' ✦ DOUBLE':''}`);
+  if(p.jail){
+    if(isD){p.jail=false;p.jailTurns=0;addLog(gs,`⚡ ${p.name} tung đôi thoát ngục!`,true);doMove(gs,p,v1+v2,false);}
+    else{
+      p.jailTurns=(p.jailTurns||0)+1;
+      if(p.jailTurns>=3){p.money-=50;p.jail=false;p.jailTurns=0;addLog(gs,`${p.name} nộp 50¥ thoát ngục.`);doMove(gs,p,v1+v2,false);}
+      else{addLog(gs,`${p.name} ở ngục (${p.jailTurns}/3).`);gs.hasRolled=true;}
+    }
+  } else {
+    if(gs.dblCount>=3){addLog(gs,`⚠ ${p.name} tung đôi 3 lần — vào tù!`,true);doGoJail(gs,p);gs.hasRolled=true;}
+    else doMove(gs,p,v1+v2,isD);
+  }
+  gs.lastUpdate=Date.now();
+  gameState=gs;
+  const needModal=gs._pendingBuy;
+  if(!needModal){await saveRoom(roomCode,gs);}
+  renderGame();
+  if(needModal){openBuyModal2(gs._pendingBuy.p,gs._pendingBuy.cell,gs._pendingBuy.isD);}
+};
+
+function addLog(gs,t,hi=false){gs.log=gs.log||[];gs.log.push({t,hi});if(gs.log.length>30)gs.log.shift();}
+
+function doMove(gs,p,steps,isD){
+  const old=p.pos;p.pos=(p.pos+steps)%40;
+  if(p.pos<old){p.money+=200;addLog(gs,`✦ ${p.name} qua Xuất Phát +200¥!`,true);}
+  const cell=gs.cells[p.pos];addLog(gs,`→ ${cell.name}`);
+  doLand(gs,p,cell,isD);
+}
+
+function doLand(gs,p,cell,isD){
+  if(cell.type==='gj'){doGoJail(gs,p);gs.hasRolled=true;return;}
+  if(cell.type==='tax'){p.money-=cell.amount;addLog(gs,`${p.name} nộp thuế ${cell.amount}¥`,true);checkBk(gs,p);gs.hasRolled=true;if(isD)gs.hasRolled=false;return;}
+  if(cell.type==='cc'){
+    const card=CC[gs.ccIdx%CC.length];gs.ccIdx++;
+    const amt=parseInt(card.f);p.money+=amt;
+    addLog(gs,`卍 ${p.name}: ${card.t}`,true);
+    checkBk(gs,p);gs.hasRolled=true;if(isD)gs.hasRolled=false;return;
+  }
+  if(cell.type==='property'||cell.type==='railroad'||cell.type==='utility'){
+    if(cell.owner==null){
+      gs.hasRolled=true;if(isD)gs.hasRolled=false;
+      gs._pendingBuy={p,cell,isD};return;
+    } else if(cell.owner!==gs.cur){
+      const rent=calcRent2(gs,cell);
+      const owner=gs.players[cell.owner];
+      p.money-=rent;owner.money+=rent;
+      addLog(gs,`${p.name} trả ${rent}¥ thuê cho ${owner.name}`,true);
+      checkBk(gs,p);
+    }
+  }
+  gs.hasRolled=true;if(isD)gs.hasRolled=false;
+}
+
+function calcRent2(gs,cell){
+  if(cell.type==='railroad'){const n=gs.cells.filter(c=>c.type==='railroad'&&c.owner===cell.owner).length;return cell.baseRent*Math.pow(2,n-1);}
+  if(cell.type==='utility'){const n=gs.cells.filter(c=>c.type==='utility'&&c.owner===cell.owner).length;return(d6()+d6())*(n===2?10:4);}
+  if(cell.type==='property'){const grp=gs.cells.filter(c=>c.type==='property'&&c.group===cell.group);const all=grp.every(c=>c.owner===cell.owner);const h=cell.houses||0;if(h>0)return cell.rent[h];return all?cell.rent[0]*2:cell.rent[0];}
+  return 0;
+}
+
+function doGoJail(gs,p){p.pos=10;p.jail=true;p.jailTurns=0;addLog(gs,`鬼 ${p.name} bị giam ngục!`,true);}
+
+function checkBk(gs,p){
+  if(p.money<0){
+    p.bankrupt=true;
+    addLog(gs,`✦ ${p.name} phá sản!`,true);
+    gs.cells.forEach(c=>{
+      const pi=gs.players.indexOf(p);
+      if(c.owner===pi)c.owner=null;
+    });
+    const alive=gs.players.filter(x=>!x.bankrupt);
+    if(alive.length===1){gs.phase='ended';gs.winner=gs.players.indexOf(alive[0]);}
+  }
+}
+
+function openBuyModal2(p,cell,isD){
+  document.getElementById('mbar').style.background=cell.color?CM[cell.color]:cell.type==='railroad'?'#2a2a2a':'#0d6e56';
+  document.getElementById('mtitle').textContent=cell.name;
+  const canBuy=p.money>=cell.price;
+  const rentStr=cell.type==='property'?cell.rent[0]+'¥':cell.type==='railroad'?cell.baseRent+'¥':'Biến đổi';
+  document.getElementById('mstats').innerHTML=`<div class="mstat"><span>Giá mua</span><span>${cell.price}¥</span></div><div class="mstat"><span>Tiền thuê</span><span>${rentStr}</span></div><div class="mstat"><span>Số dư</span><span>${p.money.toLocaleString()}¥</span></div>`;
+  document.getElementById('mbody').textContent=canBuy?`Thu phục ${cell.name} để mở rộng lãnh địa.`:`Không đủ nguyền lực.`;
+  const btns=document.getElementById('mbtns');btns.innerHTML='';
+  const buy=document.createElement('button');
+  buy.className='mbtn p';buy.textContent=canBuy?`Thu phục ${cell.price}¥`:'Thiếu lực';
+  buy.disabled=!canBuy;
+  buy.onclick=async()=>{
+    const gs=JSON.parse(JSON.stringify(gameState));
+    const pi=gs.players.findIndex(x=>x.id===myId);
+    gs.players[pi].money-=cell.price;
+    const ci=gs.cells.findIndex(c=>c.id===cell.id);
+    gs.cells[ci].owner=pi;
+    addLog(gs,`✦ ${gs.players[pi].name} thu phục ${cell.name} (${cell.price}¥)`,true);
+    delete gs._pendingBuy;gs.lastUpdate=Date.now();
+    gameState=gs;await saveRoom(roomCode,gs);
+    document.getElementById('mwrap').classList.remove('open');renderGame();
+  };
+  const pass=document.createElement('button');
+  pass.className='mbtn';pass.textContent='Bỏ qua';
+  pass.onclick=async()=>{
+    const gs=JSON.parse(JSON.stringify(gameState));
+    delete gs._pendingBuy;gs.lastUpdate=Date.now();
+    gameState=gs;await saveRoom(roomCode,gs);
+    document.getElementById('mwrap').classList.remove('open');renderGame();
+  };
+  btns.appendChild(buy);btns.appendChild(pass);
+  document.getElementById('mwrap').classList.add('open');
+}
+
+document.getElementById('endBtn').onclick=async()=>{
+  if(!isMyTurn()||!gameState.hasRolled)return;
+  const gs=JSON.parse(JSON.stringify(gameState));
+  gs.hasRolled=false;gs.dblCount=0;delete gs._pendingBuy;
+  let n=(gs.cur+1)%gs.players.length;
+  for(let i=0;i<gs.players.length;i++){if(!gs.players[n].bankrupt)break;n=(n+1)%gs.players.length;}
+  gs.cur=n;
+  addLog(gs,`── Lượt của ${gs.players[n].name} ──`);
+  gs.lastUpdate=Date.now();
+  gameState=gs;await saveRoom(roomCode,gs);renderGame();
+};
+
+function showWinner2(){
+  if(!gameState)return;
+  document.querySelector('.gw').style.display='none';
+  document.getElementById('mwrap').style.display='none';
+  const ws=document.getElementById('wscr');ws.style.display='block';
+  const w=gameState.players[gameState.winner];
+  if(!w)return;
+  const ch=getChar(w.charId);
+  document.getElementById('wchar').innerHTML=ch.svg;
+  document.getElementById('wname').textContent=w.name;
+  document.getElementById('wmoney').textContent=w.money.toLocaleString()+'¥';
+}
+</script>
