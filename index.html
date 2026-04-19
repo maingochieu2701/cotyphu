@@ -42,15 +42,12 @@
         margin: 0 auto;
         padding: 12px;
       }
-
       .scr {
         display: none;
       }
       .scr.on {
         display: block;
       }
-
-      /* ── LOGO ── */
       .logo {
         text-align: center;
         padding: 1.5rem 0 1rem;
@@ -90,8 +87,6 @@
       .logo .bar::after {
         right: -7px;
       }
-
-      /* ── CARDS ── */
       .card {
         background: #13131f;
         border: 1px solid #c9a84c33;
@@ -135,16 +130,22 @@
         font-family: "Cinzel", serif;
         cursor: pointer;
         text-transform: uppercase;
-        transition: background 0.15s;
+        transition:
+          background 0.15s,
+          transform 0.1s;
         margin-bottom: 6px;
       }
       .gbtn:hover {
         background: var(--gold2);
       }
+      .gbtn:active {
+        transform: scale(0.97);
+      }
       .gbtn:disabled {
         background: #2a2a3a;
         color: #555;
         cursor: not-allowed;
+        transform: none;
       }
       .gbtn.outline {
         background: transparent;
@@ -155,8 +156,6 @@
         background: #1a1500;
         border-color: var(--gold);
       }
-
-      /* ── CHAR GRID ── */
       .char-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -174,6 +173,8 @@
         cursor: pointer;
         transition: all 0.15s;
         gap: 4px;
+        position: relative;
+        overflow: hidden;
       }
       .char-card:hover {
         border-color: #c9a84c55;
@@ -187,6 +188,20 @@
         cursor: not-allowed;
         pointer-events: none;
       }
+      .char-card .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(201, 168, 76, 0.25);
+        transform: scale(0);
+        animation: rip 0.5s ease-out;
+        pointer-events: none;
+      }
+      @keyframes rip {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
       .char-name {
         font-size: 9px;
         color: #d4cdb5;
@@ -199,8 +214,12 @@
         color: #c9a84c88;
         text-align: center;
       }
-
-      /* ── WAITING ── */
+      .char-snd-tag {
+        font-size: 6px;
+        color: #c9a84c33;
+        letter-spacing: 0.15em;
+        margin-top: 2px;
+      }
       .rcode-box {
         text-align: center;
         padding: 1.5rem;
@@ -239,25 +258,6 @@
         font-size: 12px;
         color: #d4cdb5;
       }
-      .dot-pulse {
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #c9a84c44;
-        animation: dp 1.2s infinite;
-      }
-      @keyframes dp {
-        0%,
-        100% {
-          opacity: 0.3;
-        }
-        50% {
-          opacity: 1;
-        }
-      }
-
-      /* ── GAME ── */
       .gw {
         display: grid;
         grid-template-columns: 1fr 270px;
@@ -268,7 +268,6 @@
           grid-template-columns: 1fr;
         }
       }
-
       .board-outer {
         background: #13131f;
         border: 1px solid #c9a84c33;
@@ -358,6 +357,7 @@
         height: 8px;
         background: var(--gold);
         border-radius: 50%;
+        transition: transform 0.3s;
       }
       .cc-k {
         font-size: 16px;
@@ -393,8 +393,6 @@
         border-radius: 50%;
         z-index: 2;
       }
-
-      /* ── PANEL ── */
       .panel {
         display: flex;
         flex-direction: column;
@@ -445,7 +443,6 @@
         color: #c9a84c88;
         letter-spacing: 0.1em;
       }
-
       .pstrip {
         display: flex;
         align-items: center;
@@ -485,7 +482,6 @@
         color: var(--gold);
         flex-shrink: 0;
       }
-
       .dice-wrap {
         display: flex;
         gap: 10px;
@@ -503,6 +499,11 @@
         justify-content: center;
         font-size: 24px;
         color: var(--gold2);
+        transition: border-color 0.2s;
+      }
+      .die.lit {
+        border-color: var(--gold2);
+        box-shadow: 0 0 12px #c9a84c33;
       }
       .die.roll {
         animation: da 0.4s ease;
@@ -519,7 +520,6 @@
           transform: scale(0.9) rotate(6deg);
         }
       }
-
       .logbox {
         max-height: 130px;
         overflow-y: auto;
@@ -541,7 +541,6 @@
         color: var(--gold);
         font-weight: 600;
       }
-
       .notif {
         padding: 8px 12px;
         border-radius: 8px;
@@ -562,8 +561,6 @@
         border-color: #1a4a1a;
         color: #27ae60;
       }
-
-      /* ── MODAL ── */
       #mwrap {
         display: none;
         position: fixed;
@@ -655,8 +652,6 @@
         opacity: 0.3;
         cursor: not-allowed;
       }
-
-      /* ── WINNER ── */
       #wscr {
         display: none;
         text-align: center;
@@ -697,12 +692,62 @@
         background: var(--gold);
         margin: 0 auto 20px;
       }
+      .snd-toggle {
+        background: none;
+        border: 1px solid #c9a84c33;
+        border-radius: 8px;
+        padding: 4px 10px;
+        color: #c9a84c88;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.15s;
+        line-height: 1;
+      }
+      .snd-toggle:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+      .snd-toggle.muted {
+        opacity: 0.4;
+      }
+      .vol-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 0;
+      }
+      .vol-bar input[type="range"] {
+        flex: 1;
+        accent-color: var(--gold);
+        height: 3px;
+        cursor: pointer;
+      }
+      .vol-bar span {
+        font-size: 7px;
+        color: #c9a84c55;
+        letter-spacing: 0.1em;
+        min-width: 24px;
+        text-align: right;
+      }
+      .eq-bar {
+        display: flex;
+        gap: 2px;
+        align-items: flex-end;
+        height: 18px;
+        padding: 2px 0;
+      }
+      .eq-bar div {
+        width: 3px;
+        background: var(--gold);
+        border-radius: 1px;
+        transition: height 0.1s;
+        opacity: 0.6;
+      }
     </style>
   </head>
   <body>
     <div id="R">
       <div class="notif" id="notif"></div>
-
       <div id="s-lobby" class="scr on">
         <div class="logo">
           <div class="k">呪術廻戦</div>
@@ -745,7 +790,6 @@
           <button class="gbtn outline" id="joinBtn">Vào phòng</button>
         </div>
       </div>
-
       <div id="s-wait" class="scr">
         <div class="logo">
           <div class="k">呪術廻戦</div>
@@ -779,7 +823,6 @@
         </div>
         <button class="gbtn outline" onclick="location.reload()">Thoát</button>
       </div>
-
       <div id="s-game" class="scr">
         <div
           style="
@@ -793,10 +836,16 @@
           <div style="font-size: 9px; letter-spacing: 0.3em; color: #c9a84c44">
             呪術廻戦 MONOPOLY
           </div>
-          <div
-            id="roomTag"
-            style="font-size: 9px; color: #c9a84c55; letter-spacing: 0.1em"
-          ></div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <div class="eq-bar" id="eqBar"></div>
+            <div
+              id="roomTag"
+              style="font-size: 9px; color: #c9a84c55; letter-spacing: 0.1em"
+            ></div>
+            <button class="snd-toggle" id="sndBtn" title="Bật/tắt âm thanh">
+              🔊
+            </button>
+          </div>
         </div>
         <div class="gw">
           <div class="board-outer"><div class="board" id="board"></div></div>
@@ -828,6 +877,19 @@
               <div class="plabel">Nhật ký</div>
               <div class="logbox" id="logBox"></div>
             </div>
+            <div class="pcard">
+              <div class="vol-bar">
+                <span style="min-width: 32px">🔊 ÂM</span>
+                <input
+                  type="range"
+                  id="volSlider"
+                  min="0"
+                  max="100"
+                  value="40"
+                />
+                <span id="volVal">40%</span>
+              </div>
+            </div>
           </div>
         </div>
         <div id="wscr">
@@ -840,7 +902,6 @@
         </div>
       </div>
     </div>
-
     <div id="mwrap">
       <div class="modal">
         <div class="mbar" id="mbar"></div>
@@ -852,22 +913,439 @@
     </div>
 
     <script>
-      // ══════════════════════════════════════════
-      //  ÂM THANH (SOUND EFFECTS)
-      // ══════════════════════════════════════════
-      const sfxRoll = new Audio(
-        "https://www.soundjay.com/misc/sounds/dice-roll-1.mp3",
-      );
-      const sfxBuy = new Audio(
-        "https://www.soundjay.com/misc/sounds/magic-chime-01.mp3",
-      );
-      const sfxJail = new Audio(
-        "https://www.soundjay.com/misc/sounds/fail-buzzer-01.mp3",
-      );
+      /* ═══════════════════════════════════════════
+       HỆ THỐNG ÂM THANH — Web Audio API Synth
+       ═══════════════════════════════════════════ */
+      const SFX = {
+        ctx: null,
+        master: null,
+        muted: false,
+        vol: 0.4,
+        eqEl: null,
 
-      // ══════════════════════════════════════════
-      //  FIREBASE CONFIG
-      // ══════════════════════════════════════════
+        /* Nhạc cụ cho từng nhân vật */
+        themes: {
+          yuji: {
+            wave: "sawtooth",
+            notes: [261.63, 329.63, 392.0],
+            detune: 5,
+            label: "Năng lượng",
+          },
+          megumi: {
+            wave: "triangle",
+            notes: [293.66, 349.23, 440.0],
+            detune: -3,
+            label: "Bóng tối",
+          },
+          nobara: {
+            wave: "square",
+            notes: [440.0, 554.37, 659.25],
+            detune: 8,
+            label: "Sắc bén",
+          },
+          gojo: {
+            wave: "sine",
+            notes: [329.63, 415.3, 493.88],
+            detune: 0,
+            label: "Vô cực",
+          },
+          nanami: {
+            wave: "triangle",
+            notes: [349.23, 440.0, 523.25],
+            detune: -2,
+            label: "Điệu đà",
+          },
+          sukuna: {
+            wave: "sawtooth",
+            notes: [246.94, 293.66, 369.99],
+            detune: 12,
+            label: "Uy lực",
+          },
+          todo: {
+            wave: "square",
+            notes: [392.0, 493.88, 587.33],
+            detune: 4,
+            label: "Bạo lực",
+          },
+          choso: {
+            wave: "sine",
+            notes: [415.3, 493.88, 622.25],
+            detune: -6,
+            label: "Melancholy",
+          },
+        },
+
+        init() {
+          try {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.master = this.ctx.createGain();
+            this.master.gain.value = this.vol;
+            this.master.connect(this.ctx.destination);
+          } catch (e) {
+            console.warn("Web Audio không hỗ trợ:", e);
+          }
+          /* EQ bar */
+          this.eqEl = document.getElementById("eqBar");
+          if (this.eqEl) {
+            for (let i = 0; i < 8; i++) {
+              const d = document.createElement("div");
+              d.style.height = "3px";
+              this.eqEl.appendChild(d);
+            }
+          }
+        },
+
+        resume() {
+          if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+        },
+
+        toggle() {
+          this.muted = !this.muted;
+          const btn = document.getElementById("sndBtn");
+          btn.textContent = this.muted ? "🔇" : "🔊";
+          btn.classList.toggle("muted", this.muted);
+        },
+
+        setVol(v) {
+          this.vol = v;
+          if (this.master) this.master.gain.value = v;
+          document.getElementById("volVal").textContent =
+            Math.round(v * 100) + "%";
+        },
+
+        /* Phát 1 nốt nhạc */
+        note(freq, wave, dur, vol, delay = 0, detune = 0) {
+          if (this.muted || !this.ctx) return;
+          const t = this.ctx.currentTime + delay;
+          const o = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          o.type = wave;
+          o.frequency.setValueAtTime(freq, t);
+          o.detune.setValueAtTime(detune, t);
+          g.gain.setValueAtTime(0, t);
+          g.gain.linearRampToValueAtTime(vol, t + 0.008);
+          g.gain.setValueAtTime(vol, t + dur * 0.6);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          o.connect(g);
+          g.connect(this.master);
+          o.start(t);
+          o.stop(t + dur + 0.05);
+        },
+
+        /* Tiếng ồn (xúc xắc) */
+        noise(dur, vol, delay = 0, hp = 3000) {
+          if (this.muted || !this.ctx) return;
+          const t = this.ctx.currentTime + delay;
+          const sz = this.ctx.sampleRate * dur;
+          const buf = this.ctx.createBuffer(1, sz, this.ctx.sampleRate);
+          const d = buf.getChannelData(0);
+          for (let i = 0; i < sz; i++) d[i] = Math.random() * 2 - 1;
+          const s = this.ctx.createBufferSource();
+          s.buffer = buf;
+          const f = this.ctx.createBiquadFilter();
+          f.type = "highpass";
+          f.frequency.value = hp;
+          const g = this.ctx.createGain();
+          g.gain.setValueAtTime(vol, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          s.connect(f);
+          f.connect(g);
+          g.connect(this.master);
+          s.start(t);
+        },
+
+        /* Nhịp đập bass */
+        kick(vol = 0.5, delay = 0) {
+          if (this.muted || !this.ctx) return;
+          const t = this.ctx.currentTime + delay;
+          const o = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          o.frequency.setValueAtTime(150, t);
+          o.frequency.exponentialRampToValueAtTime(30, t + 0.12);
+          g.gain.setValueAtTime(vol, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+          o.connect(g);
+          g.connect(this.master);
+          o.start(t);
+          o.stop(t + 0.2);
+        },
+
+        /* EQ visualization */
+        pulseEQ(intensity = 1) {
+          if (!this.eqEl) return;
+          const bars = this.eqEl.children;
+          for (let i = 0; i < bars.length; i++) {
+            const h = 3 + Math.random() * 15 * intensity;
+            bars[i].style.height = h + "px";
+            bars[i].style.opacity = 0.3 + intensity * 0.5;
+          }
+          clearTimeout(this._eqTimer);
+          this._eqTimer = setTimeout(() => {
+            for (let i = 0; i < bars.length; i++) {
+              bars[i].style.height = "3px";
+              bars[i].style.opacity = "0.3";
+            }
+          }, 400);
+        },
+
+        /* ── GET THEME ── */
+        th(charId) {
+          return this.themes[charId] || this.themes.yuji;
+        },
+
+        /* ═══ SỰ KIỆN GAME ═══ */
+
+        /* Chọn nhân vật — preview 3 nốt */
+        preview(charId) {
+          this.resume();
+          const t = this.th(charId);
+          t.notes.forEach((f, i) =>
+            this.note(f, t.wave, 0.2, 0.15, i * 0.08, t.detune),
+          );
+          this.pulseEQ(0.5);
+        },
+
+        /* Tung xúc xắc */
+        roll(charId) {
+          this.resume();
+          const t = this.th(charId);
+          this.noise(0.12, 0.25, 0, 4000);
+          this.noise(0.08, 0.15, 0.06, 5000);
+          this.kick(0.3, 0);
+          this.note(t.notes[0], t.wave, 0.15, 0.12, 0.02, t.detune);
+          this.pulseEQ(0.8);
+        },
+
+        /* Double — thêm lớp octave + sáng hơn */
+        double(charId) {
+          this.resume();
+          const t = this.th(charId);
+          this.noise(0.15, 0.3, 0, 3000);
+          this.kick(0.4, 0);
+          this.kick(0.35, 0.08);
+          t.notes.forEach((f, i) => {
+            this.note(f, t.wave, 0.2, 0.15, i * 0.06, t.detune);
+            this.note(f * 2, "sine", 0.15, 0.08, i * 0.06 + 0.03, 0);
+          });
+          this.pulseEQ(1);
+        },
+
+        /* Mua đất — arpeggio lên */
+        buy(charId) {
+          this.resume();
+          const t = this.th(charId);
+          t.notes.forEach((f, i) =>
+            this.note(f, "sine", 0.25, 0.18, i * 0.1, 0),
+          );
+          this.note(t.notes[2] * 2, "sine", 0.4, 0.12, 0.3, 0);
+          this.kick(0.15, 0.05);
+          this.pulseEQ(0.7);
+        },
+
+        /* Bỏ qua mua — nốt trầm xuống */
+        pass() {
+          this.resume();
+          this.note(300, "triangle", 0.15, 0.08, 0);
+          this.note(250, "triangle", 0.2, 0.06, 0.08);
+          this.pulseEQ(0.2);
+        },
+
+        /* Trả tiền thuê — nốt xuống buồn */
+        rentPay(charId) {
+          this.resume();
+          const t = this.th(charId);
+          this.note(t.notes[2], t.wave, 0.2, 0.12, 0, t.detune);
+          this.note(t.notes[1], t.wave, 0.25, 0.1, 0.1, t.detune);
+          this.note(t.notes[0] * 0.8, t.wave, 0.3, 0.08, 0.2, t.detune);
+          this.pulseEQ(0.4);
+        },
+
+        /* Nhận tiền thuê — nốt lên vui */
+        rentGet(charId) {
+          this.resume();
+          const t = this.th(charId);
+          this.note(t.notes[0], "sine", 0.15, 0.1, 0);
+          this.note(t.notes[1], "sine", 0.15, 0.12, 0.08);
+          this.note(t.notes[2], "sine", 0.2, 0.14, 0.16);
+          this.pulseEQ(0.6);
+        },
+
+        /* Rút bài — shimmer kỳ bí */
+        cardDraw() {
+          this.resume();
+          for (let i = 0; i < 5; i++) {
+            this.note(800 + Math.random() * 1200, "sine", 0.08, 0.04, i * 0.04);
+          }
+          this.noise(0.1, 0.06, 0.05, 6000);
+          this.pulseEQ(0.5);
+        },
+
+        /* Bài tốt — ascending chime */
+        cardGood(charId) {
+          this.resume();
+          const t = this.th(charId);
+          [0, 1, 2, 2].forEach((ni, i) =>
+            this.note(t.notes[ni], "sine", 0.2, 0.12, i * 0.07),
+          );
+          this.pulseEQ(0.6);
+        },
+
+        /* Bài xấu — dissonant */
+        cardBad() {
+          this.resume();
+          this.note(200, "sawtooth", 0.3, 0.08, 0, 10);
+          this.note(207, "sawtooth", 0.3, 0.08, 0, -10);
+          this.kick(0.2, 0.1);
+          this.pulseEQ(0.3);
+        },
+
+        /* Vào tù — dark drone */
+        jail() {
+          this.resume();
+          this.noise(0.3, 0.15, 0, 800);
+          this.note(80, "sawtooth", 0.5, 0.12, 0, 0);
+          this.note(83, "sawtooth", 0.5, 0.1, 0.05, 0);
+          this.note(120, "square", 0.4, 0.06, 0.1, -5);
+          this.kick(0.35, 0);
+          this.kick(0.3, 0.15);
+          this.pulseEQ(0.5);
+        },
+
+        /* Thoát tù — bright break */
+        jailBreak(charId) {
+          this.resume();
+          const t = this.th(charId);
+          this.noise(0.1, 0.2, 0, 5000);
+          t.notes.forEach((f, i) => this.note(f, "sine", 0.25, 0.18, i * 0.07));
+          this.note(t.notes[2] * 2, "sine", 0.35, 0.12, 0.22);
+          this.pulseEQ(1);
+        },
+
+        /* Qua GO — fanfare nhỏ */
+        goSpace(charId) {
+          this.resume();
+          const t = this.th(charId);
+          [0, 1, 2, 0, 2].forEach((ni, i) =>
+            this.note(
+              t.notes[ni] * (i >= 3 ? 1.5 : 1),
+              "sine",
+              0.15,
+              0.13,
+              i * 0.06,
+            ),
+          );
+          this.kick(0.15, 0);
+          this.pulseEQ(0.8);
+        },
+
+        /* Thuế — 2 nhịp trầm */
+        tax() {
+          this.resume();
+          this.kick(0.25, 0);
+          this.kick(0.2, 0.12);
+          this.note(150, "triangle", 0.2, 0.08, 0);
+          this.note(130, "triangle", 0.25, 0.06, 0.1);
+          this.pulseEQ(0.3);
+        },
+
+        /* Phá sản — dramatic fall */
+        bankrupt() {
+          this.resume();
+          [400, 350, 300, 250, 180, 120].forEach((f, i) => {
+            this.note(f, "sawtooth", 0.3, 0.1 - i * 0.012, i * 0.12, 5);
+          });
+          this.noise(0.5, 0.12, 0.2, 1000);
+          this.kick(0.3, 0.3);
+          this.kick(0.25, 0.5);
+          this.pulseEQ(1);
+        },
+
+        /* Chiến thắng — fanfare lớn theo nhân vật */
+        win(charId) {
+          this.resume();
+          const t = this.th(charId);
+          const melody = [0, 1, 2, 2, 3, 2, 1, 0, 1, 2, 4];
+          const mult = [1, 1, 1, 1.5, 1.5, 1, 1, 0.75, 1, 1, 2];
+          melody.forEach((ni, i) => {
+            const f = t.notes[ni % 3] * mult[i];
+            this.note(f, "sine", 0.2, 0.16, i * 0.1);
+            if (i % 2 === 0)
+              this.note(f, t.wave, 0.15, 0.06, i * 0.1, t.detune);
+          });
+          this.kick(0.2, 0);
+          this.kick(0.2, 0.4);
+          this.kick(0.25, 0.8);
+          this.noise(0.15, 0.1, 0.8, 5000);
+          this.pulseEQ(1);
+          /* Lặp lại phần cao */
+          setTimeout(() => {
+            melody.forEach((ni, i) => {
+              const f = t.notes[ni % 3] * mult[i] * 1.5;
+              this.note(f, "sine", 0.25, 0.14, i * 0.1);
+            });
+            this.pulseEQ(1);
+          }, 1200);
+        },
+
+        /* Chuyển lượt — ping nhẹ */
+        turnPing(charId) {
+          this.resume();
+          const t = this.th(charId);
+          this.note(t.notes[0], "sine", 0.12, 0.08, 0);
+          this.pulseEQ(0.3);
+        },
+
+        /* UI click */
+        click() {
+          this.resume();
+          this.note(600, "sine", 0.05, 0.06);
+        },
+
+        /* Khai chiến — drum fill + theme */
+        battleStart() {
+          this.resume();
+          this.kick(0.2, 0);
+          this.kick(0.2, 0.1);
+          this.kick(0.25, 0.2);
+          this.noise(0.15, 0.15, 0.25, 5000);
+          this.noise(0.1, 0.1, 0.35, 6000);
+          [261.63, 329.63, 392.0, 523.25, 659.25, 783.99].forEach((f, i) => {
+            this.note(f, "sawtooth", 0.15, 0.08, 0.3 + i * 0.06);
+          });
+          this.pulseEQ(1);
+        },
+
+        /* Trong ngục — thở dài */
+        jailStay() {
+          this.resume();
+          this.note(180, "triangle", 0.4, 0.06, 0);
+          this.note(170, "triangle", 0.5, 0.04, 0.15);
+          this.pulseEQ(0.2);
+        },
+
+        /* 3 đôi = tù — cảnh báo */
+        tripleDouble() {
+          this.resume();
+          this.kick(0.3, 0);
+          this.kick(0.3, 0.15);
+          this.kick(0.35, 0.3);
+          this.noise(0.2, 0.2, 0, 2000);
+          this.note(200, "sawtooth", 0.3, 0.1, 0.35, 15);
+          this.note(205, "sawtooth", 0.3, 0.1, 0.35, -15);
+          this.pulseEQ(0.8);
+        },
+      };
+
+      /* Init audio khi user tương tác lần đầu */
+      document.addEventListener("click", () => SFX.init(), { once: true });
+      document.addEventListener("touchstart", () => SFX.init(), { once: true });
+      document.getElementById("sndBtn").onclick = () => SFX.toggle();
+      document.getElementById("volSlider").oninput = (e) =>
+        SFX.setVol(e.target.value / 100);
+
+      /* ══════════════════════════════════════════
+       FIREBASE CONFIG
+       ══════════════════════════════════════════ */
       const firebaseConfig = {
         apiKey: "AIzaSyAj1sI6cwrw2499bvMHd2mD-XxnTdWzb10",
         authDomain: "cotyphu-95ac8.firebaseapp.com",
@@ -882,9 +1360,9 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.database();
 
-      // ══════════════════════════════════
-      //  CHARACTERS (ẢNH CỤC BỘ)
-      // ══════════════════════════════════
+      /* ══════════════════════════════════
+       CHARACTERS
+       ══════════════════════════════════ */
       const CHARS = [
         {
           id: "yuji",
@@ -892,7 +1370,8 @@
           fullName: "Yuji Itadori",
           role: "Đặc cấp 1",
           color: "#c0392b",
-          image: "yuji.jpg",
+          image:
+            "https://i.pinimg.com/736x/21/2e/de/212ede51dce7d1108cf14545582f3a47.jpg",
         },
         {
           id: "megumi",
@@ -900,7 +1379,8 @@
           fullName: "Megumi Fushiguro",
           role: "Đặc cấp 1",
           color: "#1a3a5c",
-          image: "megumi.jpg",
+          image:
+            "https://i.pinimg.com/736x/43/d7/0f/43d70fc930b80db26ba75d50711cc646.jpg",
         },
         {
           id: "nobara",
@@ -908,7 +1388,8 @@
           fullName: "Nobara Kugisaki",
           role: "Đặc cấp 1",
           color: "#8b2252",
-          image: "nobara.jpg",
+          image:
+            "https://i.pinimg.com/736x/88/4a/15/884a15998a4da4dce9ecaf85de9b3bba.jpg",
         },
         {
           id: "gojo",
@@ -916,7 +1397,8 @@
           fullName: "Satoru Gojo",
           role: "Đặc cấp S",
           color: "#4fc3f7",
-          image: "gojo.jpg",
+          image:
+            "https://i.pinimg.com/736x/11/49/ba/1149ba658b4bcf54b0b14c30c31ab469.jpg",
         },
         {
           id: "nanami",
@@ -924,7 +1406,8 @@
           fullName: "Kento Nanami",
           role: "Đặc cấp 1",
           color: "#8b6a0f",
-          image: "nanami.jpg",
+          image:
+            "https://i.pinimg.com/736x/87/46/d4/8746d4999d343f8ab3475d40db9af6e6.jpg",
         },
         {
           id: "sukuna",
@@ -932,7 +1415,8 @@
           fullName: "Ryomen Sukuna",
           role: "Vương Nguyền",
           color: "#8b0000",
-          image: "sukuna.jpg",
+          image:
+            "https://i.pinimg.com/736x/09/a4/09/09a40954b4be872323cc28ba5d2d0b57.jpg",
         },
         {
           id: "todo",
@@ -940,7 +1424,8 @@
           fullName: "Aoi Todo",
           role: "Đặc cấp 1",
           color: "#1a4a1a",
-          image: "todo.jpg",
+          image:
+            "https://i.pinimg.com/736x/71/34/a5/7134a5d89f78326224e75681c7ffdb13.jpg",
         },
         {
           id: "choso",
@@ -948,7 +1433,8 @@
           fullName: "Choso",
           role: "Nguyền Linh ĐB",
           color: "#0d6e56",
-          image: "choso.jpg",
+          image:
+            "https://i.pinimg.com/736x/c5/d9/b4/c5d9b40fdb9b251fcaf0de6979116e02.jpg",
         },
       ];
 
@@ -1227,20 +1713,31 @@
         roomRef = null,
         unsubscribe = null;
 
-      // ── CHAR SELECT ──
+      /* ── CHAR SELECT ── */
       const cg = document.getElementById("charGrid");
       CHARS.forEach((ch) => {
         const el = document.createElement("div");
         el.className = "char-card";
         el.dataset.id = ch.id;
-        el.innerHTML = `<img src="${ch.image}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;margin-bottom:4px"><div class="char-name">${ch.name}</div><div class="char-role">${ch.role}</div>`;
-        el.onclick = () => {
+        const theme = SFX.themes[ch.id];
+        el.innerHTML = `<img src="${ch.image}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;margin-bottom:4px" onerror="this.style.display='none'"><div class="char-name">${ch.name}</div><div class="char-role">${ch.role}</div><div class="char-snd-tag">♪ ${theme.label}</div>`;
+        el.onclick = (e) => {
           if (el.classList.contains("taken")) return;
           document
             .querySelectorAll(".char-card")
             .forEach((c) => c.classList.remove("sel"));
           el.classList.add("sel");
           myCharId = ch.id;
+          SFX.preview(ch.id);
+          /* Ripple effect */
+          const rip = document.createElement("div");
+          rip.className = "ripple";
+          const rect = el.getBoundingClientRect();
+          rip.style.width = rip.style.height = "40px";
+          rip.style.left = e.clientX - rect.left - 20 + "px";
+          rip.style.top = e.clientY - rect.top - 20 + "px";
+          el.appendChild(rip);
+          setTimeout(() => rip.remove(), 500);
         };
         cg.appendChild(el);
       });
@@ -1249,7 +1746,7 @@
         const n = document.getElementById("notif");
         n.textContent = msg;
         n.className = "notif show" + (ok ? " ok" : "");
-        setTimeout(() => (n.className = "notif"), 3000);
+        setTimeout(() => (n.className = "notif"), 3500);
       }
       function show(id) {
         document
@@ -1258,7 +1755,19 @@
         document.getElementById(id).classList.add("on");
       }
 
-      // ── CREATE ──
+      /* ── SAFE FIREBASE ── */
+      async function safeSet(ref, data, label) {
+        try {
+          await ref.set(data);
+          return true;
+        } catch (err) {
+          console.error("[" + label + "]", err);
+          notif("Lỗi " + label + ": " + (err.message || err.code || err));
+          return false;
+        }
+      }
+
+      /* ── CREATE ── */
       document.getElementById("createBtn").onclick = async () => {
         const nm =
           document.getElementById("myName").value.trim() || "Chiến binh";
@@ -1266,44 +1775,62 @@
           notif("Hãy chọn nhân vật!");
           return;
         }
-        myId = "p" + Date.now();
-        roomCode = String(Math.floor(1000 + Math.random() * 9000));
-        const ch = getChar(myCharId);
-        const state = {
-          phase: "lobby",
-          players: [
-            {
-              id: myId,
-              name: nm,
-              charId: myCharId,
-              color: ch.color,
-              money: 1500,
-              pos: 0,
-              jail: false,
-              jailTurns: 0,
-              bankrupt: false,
-              isHost: true,
-            },
-          ],
-          cells: buildCells(),
-          cur: 0,
-          hasRolled: false,
-          dblCount: 0,
-          ccIdx: 0,
-          log: [],
-          lastDice: [1, 1],
-          ts: Date.now(),
-        };
-        roomRef = db.ref("rooms/" + roomCode);
-        await roomRef.set(state);
-        gameState = state;
-        listenRoom();
-        show("s-wait");
-        document.getElementById("rcodeDisplay").textContent = roomCode;
-        document.getElementById("roomTag").textContent = "Phòng " + roomCode;
+        const btn = document.getElementById("createBtn");
+        btn.disabled = true;
+        btn.textContent = "Đang tạo...";
+        SFX.click();
+        try {
+          myId =
+            "p" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+          roomCode = String(Math.floor(1000 + Math.random() * 9000));
+          const ch = getChar(myCharId);
+          const state = {
+            phase: "lobby",
+            players: [
+              {
+                id: myId,
+                name: nm,
+                charId: myCharId,
+                color: ch.color,
+                money: 1500,
+                pos: 0,
+                jail: false,
+                jailTurns: 0,
+                bankrupt: false,
+                isHost: true,
+              },
+            ],
+            cells: buildCells(),
+            cur: 0,
+            hasRolled: false,
+            dblCount: 0,
+            ccIdx: 0,
+            log: [],
+            lastDice: [1, 1],
+            ts: Date.now(),
+          };
+          roomRef = db.ref("rooms/" + roomCode);
+          const ok = await safeSet(roomRef, state, "Tạo phòng");
+          if (!ok) {
+            btn.disabled = false;
+            btn.textContent = "Tạo phòng";
+            return;
+          }
+          gameState = state;
+          listenRoom();
+          show("s-wait");
+          document.getElementById("rcodeDisplay").textContent = roomCode;
+          document.getElementById("roomTag").textContent = "Phòng " + roomCode;
+          notif("Tạo phòng thành công!", true);
+        } catch (err) {
+          console.error(err);
+          notif("Lỗi: " + err.message);
+          btn.disabled = false;
+          btn.textContent = "Tạo phòng";
+        }
       };
 
-      // ── JOIN ──
+      /* ── JOIN ── */
       document.getElementById("joinBtn").onclick = async () => {
         const nm =
           document.getElementById("myName").value.trim() || "Chiến binh";
@@ -1312,73 +1839,129 @@
           return;
         }
         const code = document.getElementById("roomInput").value.trim();
-        if (code.length !== 4) {
-          notif("Mã phòng phải 4 chữ số!");
+        if (!/^\d{4}$/.test(code)) {
+          notif("Mã phòng phải là 4 chữ số!");
           return;
         }
-        roomRef = db.ref("rooms/" + code);
-        const snap = await roomRef.once("value");
-        const state = snap.val();
-        if (!state) {
-          notif("Không tìm thấy phòng!");
-          return;
+        const btn = document.getElementById("joinBtn");
+        btn.disabled = true;
+        btn.textContent = "Đang vào...";
+        SFX.click();
+        try {
+          roomRef = db.ref("rooms/" + code);
+          let snap;
+          try {
+            snap = await roomRef.once("value");
+          } catch (e) {
+            notif("Không kết nối được Firebase.");
+            btn.disabled = false;
+            btn.textContent = "Vào phòng";
+            return;
+          }
+          const state = snap.val();
+          if (!state) {
+            notif("Không tìm thấy phòng!");
+            btn.disabled = false;
+            btn.textContent = "Vào phòng";
+            return;
+          }
+          if (state.phase !== "lobby") {
+            notif("Phòng đã bắt đầu!");
+            btn.disabled = false;
+            btn.textContent = "Vào phòng";
+            return;
+          }
+          if (state.players.length >= 4) {
+            notif("Phòng đã đầy!");
+            btn.disabled = false;
+            btn.textContent = "Vào phòng";
+            return;
+          }
+          if (state.players.some((p) => p.charId === myCharId)) {
+            notif("Nhân vật đã bị chọn!");
+            btn.disabled = false;
+            btn.textContent = "Vào phòng";
+            return;
+          }
+          myId =
+            "p" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+          roomCode = code;
+          const ch = getChar(myCharId);
+          state.players.push({
+            id: myId,
+            name: nm,
+            charId: myCharId,
+            color: ch.color,
+            money: 1500,
+            pos: 0,
+            jail: false,
+            jailTurns: 0,
+            bankrupt: false,
+            isHost: false,
+          });
+          state.ts = Date.now();
+          const ok = await safeSet(roomRef, state, "Vào phòng");
+          if (!ok) {
+            btn.disabled = false;
+            btn.textContent = "Vào phòng";
+            return;
+          }
+          gameState = state;
+          listenRoom();
+          show("s-wait");
+          document.getElementById("rcodeDisplay").textContent = roomCode;
+          document.getElementById("roomTag").textContent = "Phòng " + roomCode;
+          notif("Vào phòng thành công!", true);
+        } catch (err) {
+          console.error(err);
+          notif("Lỗi: " + err.message);
+          btn.disabled = false;
+          btn.textContent = "Vào phòng";
         }
-        if (state.phase !== "lobby") {
-          notif("Phòng đã bắt đầu!");
-          return;
-        }
-        if (state.players.length >= 4) {
-          notif("Phòng đã đầy!");
-          return;
-        }
-        if (state.players.some((p) => p.charId === myCharId)) {
-          notif("Nhân vật đã bị chọn! Đổi nhân vật khác.");
-          return;
-        }
-        myId = "p" + Date.now();
-        roomCode = code;
-        const ch = getChar(myCharId);
-        state.players.push({
-          id: myId,
-          name: nm,
-          charId: myCharId,
-          color: ch.color,
-          money: 1500,
-          pos: 0,
-          jail: false,
-          jailTurns: 0,
-          bankrupt: false,
-          isHost: false,
-        });
-        state.ts = Date.now();
-        await roomRef.set(state);
-        gameState = state;
-        listenRoom();
-        show("s-wait");
-        document.getElementById("rcodeDisplay").textContent = roomCode;
-        document.getElementById("roomTag").textContent = "Phòng " + roomCode;
       };
 
       function listenRoom() {
         if (unsubscribe) unsubscribe();
-        unsubscribe = roomRef.on("value", (snap) => {
-          const s = snap.val();
-          if (!s) return;
-          gameState = s;
-          if (s.phase === "lobby") {
-            renderLobby();
-          } else if (s.phase === "game") {
-            if (document.getElementById("s-wait").classList.contains("on"))
-              show("s-game");
-            renderGame();
-          } else if (s.phase === "ended") {
-            show("s-game");
-            showWinner();
-          }
-        });
+        try {
+          unsubscribe = roomRef.on(
+            "value",
+            (snap) => {
+              try {
+                const s = snap.val();
+                if (!s) {
+                  notif("Phòng bị xóa.");
+                  return;
+                }
+                const prevPhase = gameState ? gameState.phase : null;
+                gameState = s;
+                if (s.phase === "lobby") renderLobby();
+                else if (s.phase === "game") {
+                  if (
+                    document.getElementById("s-wait").classList.contains("on")
+                  ) {
+                    show("s-game");
+                    if (prevPhase === "lobby") SFX.battleStart();
+                  }
+                  renderGame();
+                } else if (s.phase === "ended") {
+                  show("s-game");
+                  showWinner();
+                }
+              } catch (e) {
+                console.error("listener:", e);
+              }
+            },
+            (err) => {
+              console.error("listen err:", err);
+              notif("Mất kết nối: " + (err.message || err.code));
+            },
+          );
+        } catch (e) {
+          console.error("listenRoom:", e);
+        }
       }
 
-      // ── LOBBY ──
+      /* ── LOBBY ── */
       function renderLobby() {
         const gs = gameState;
         const ll = document.getElementById("lobbyList");
@@ -1387,20 +1970,20 @@
         const takenChars = gs.players
           .filter((p) => p.id !== myId)
           .map((p) => p.charId);
-        document.querySelectorAll(".char-card").forEach((el) => {
-          el.classList.toggle("taken", takenChars.includes(el.dataset.id));
-        });
+        document
+          .querySelectorAll(".char-card")
+          .forEach((el) =>
+            el.classList.toggle("taken", takenChars.includes(el.dataset.id)),
+          );
         gs.players.forEach((p) => {
           const ch = getChar(p.charId);
           const row = document.createElement("div");
           row.className = "lp-row" + (p.id === myId ? " me" : "");
-          row.innerHTML = `<div><img src="${ch.image}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;"></div>
-    <div class="lp-name">${p.name}${p.isHost ? " ✦" : ""}</div>
-    <div style="font-size:9px;color:var(--gold)">${p.id === myId ? "Bạn" : "Đã vào"}</div>`;
+          row.innerHTML = `<div><img src="${ch.image}" style="width:30px;height:30px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'"></div><div class="lp-name">${p.name}${p.isHost ? " ✦" : ""}</div><div style="font-size:9px;color:var(--gold)">${p.id === myId ? "Bạn" : "Đã vào"}</div>`;
           ll.appendChild(row);
         });
-        const sb = document.getElementById("startBtn");
-        const wm = document.getElementById("waitMsg");
+        const sb = document.getElementById("startBtn"),
+          wm = document.getElementById("waitMsg");
         if (amHost && gs.players.length >= 2) {
           sb.style.display = "block";
           wm.style.display = "none";
@@ -1415,13 +1998,22 @@
 
       document.getElementById("startBtn").onclick = async () => {
         if (!gameState) return;
+        const btn = document.getElementById("startBtn");
+        btn.disabled = true;
+        btn.textContent = "Đang khởi động...";
+        SFX.click();
         const gs = JSON.parse(JSON.stringify(gameState));
         gs.phase = "game";
         gs.ts = Date.now();
-        await roomRef.set(gs);
+        gs.log.push({ t: "══ Khai chiến! ══", hi: true });
+        const ok = await safeSet(roomRef, gs, "Khai chiến");
+        if (!ok) {
+          btn.disabled = false;
+          btn.textContent = "⚔ Khai chiến!";
+        }
       };
 
-      // ── BOARD ──
+      /* ── BOARD ── */
       function drawBoard() {
         const gs = gameState;
         const board = document.getElementById("board");
@@ -1434,10 +2026,7 @@
                 const c = document.createElement("div");
                 c.className = "center-cell";
                 c.style.cssText = "grid-row:2/11;grid-column:2/11";
-                c.innerHTML = `<div class="cc-ring" style="width:80%;height:80%;left:10%;top:10%"></div>
-          <div class="cc-ring" style="width:55%;height:55%;left:22.5%;top:22.5%"></div>
-          <div class="cc-eye"><div class="cc-pupil"></div></div>
-          <div class="cc-k">呪術廻戦</div><div class="cc-e">MONOPOLY</div>`;
+                c.innerHTML = `<div class="cc-ring" style="width:80%;height:80%;left:10%;top:10%"></div><div class="cc-ring" style="width:55%;height:55%;left:22.5%;top:22.5%"></div><div class="cc-eye"><div class="cc-pupil" id="pupil"></div></div><div class="cc-k">呪術廻戦</div><div class="cc-e">MONOPOLY</div>`;
                 board.appendChild(c);
               }
               continue;
@@ -1454,11 +2043,7 @@
             el.className =
               "cell" +
               (idx % 10 === 0 ? " corner" : "") +
-              (cd.type === "cc" ||
-              cd.type === "tax" ||
-              cd.type === "park" ||
-              cd.type === "go" ||
-              cd.type === "jv"
+              (["cc", "tax", "park", "go", "jv"].includes(cd.type)
                 ? " special"
                 : "");
             el.style.cssText = `grid-row:${row + 1};grid-column:${col + 1}`;
@@ -1495,14 +2080,29 @@
               .forEach((p) => {
                 const ch = getChar(p.charId);
                 const w = document.createElement("div");
-                w.style.cssText = `width:13px;height:13px;border-radius:50%;overflow:hidden;border:1px solid ${p.color};background:#0a0a12;flex-shrink:0`;
-                w.innerHTML = `<img src="${ch.image}" style="width:100%;height:100%;object-fit:cover;">`;
+                w.style.cssText = `width:13px;height:13px;border-radius:50%;overflow:hidden;border:1.5px solid ${p.color};background:#0a0a12;flex-shrink:0`;
+                w.innerHTML = `<img src="${ch.image}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
                 w.title = p.name;
                 tl.appendChild(w);
               });
             el.appendChild(tl);
             board.appendChild(el);
           }
+        }
+        /* Con ngươi theo chuột */
+        const pupil = document.getElementById("pupil");
+        if (pupil) {
+          const movePupil = (e) => {
+            const eye = pupil.parentElement;
+            if (!eye) return;
+            const r = eye.getBoundingClientRect();
+            const dx = e.clientX - (r.left + r.width / 2);
+            const dy = e.clientY - (r.top + r.height / 2);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const maxM = 3;
+            pupil.style.transform = `translate(${(dx / dist) * maxM}px, ${(dy / dist) * maxM}px)`;
+          };
+          document.addEventListener("mousemove", movePupil);
         }
       }
 
@@ -1513,6 +2113,9 @@
           !gameState.players[gameState.cur]?.bankrupt
         );
       }
+
+      /* Lưu lượt trước để detect thay đổi */
+      let _prevCur = -1;
 
       function renderGame() {
         if (!gameState) return;
@@ -1525,8 +2128,15 @@
         const cp = gs.players[gs.cur];
         const ch = cp ? getChar(cp.charId) : null;
         const myTurn = isMyTurn();
+
+        /* Ping khi đổi lượt */
+        if (gs.cur !== _prevCur && _prevCur !== -1 && cp) {
+          SFX.turnPing(cp.charId);
+        }
+        _prevCur = gs.cur;
+
         document.getElementById("tbChar").innerHTML = ch
-          ? `<img src="${ch.image}" style="width:36px;height:36px;border-radius:50%;border:1.5px solid #c9a84c44;object-fit:cover;background:#0a0a12">`
+          ? `<img src="${ch.image}" style="width:36px;height:36px;border-radius:50%;border:1.5px solid #c9a84c44;object-fit:cover;background:#0a0a12" onerror="this.style.display='none'">`
           : "";
         document.getElementById("tbName").textContent = cp
           ? cp.name + (cp.id === myId ? " (Bạn)" : "")
@@ -1554,9 +2164,7 @@
             (i === gs.cur && !p.bankrupt ? " active" : "") +
             (p.bankrupt ? " bk" : "") +
             (p.id === myId ? " me" : "");
-          s.innerHTML = `<img src="${ch2.image}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid ${p.color};flex-shrink:0;background:#0a0a12">
-    <div style="flex:1;min-width:0"><div class="ps-name">${p.name}${p.id === myId ? " ★" : ""}</div><div class="ps-pos">${gs.cells[p.pos]?.name || "Xuất phát"}</div></div>
-    <div class="ps-m">${p.money.toLocaleString()}¥</div>`;
+          s.innerHTML = `<img src="${ch2.image}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid ${p.color};flex-shrink:0;background:#0a0a12" onerror="this.style.display='none'"><div style="flex:1;min-width:0"><div class="ps-name">${p.name}${p.id === myId ? " ★" : ""}</div><div class="ps-pos">${gs.cells[p.pos]?.name || "Xuất phát"}</div></div><div class="ps-m">${p.money.toLocaleString()}¥</div>`;
           pi.appendChild(s);
         });
         const lb = document.getElementById("logBox");
@@ -1572,36 +2180,40 @@
           });
       }
 
-      // ── ROLL ──
+      /* ── ROLL ── */
       document.getElementById("rollBtn").onclick = async () => {
         if (!isMyTurn() || gameState.hasRolled) return;
-
-        // Bật tiếng tung xúc xắc
-        sfxRoll.play().catch((e) => console.log(e));
-
         const gs = JSON.parse(JSON.stringify(gameState));
         const p = gs.players[gs.cur];
         const v1 = d6(),
           v2 = d6();
         const isD = v1 === v2;
         gs.lastDice = [v1, v2];
-        document.getElementById("d1").classList.add("roll");
-        document.getElementById("d2").classList.add("roll");
+
+        /* Âm thanh xúc xắc */
+        if (isD) SFX.double(p.charId);
+        else SFX.roll(p.charId);
+
+        document.getElementById("d1").classList.add("roll", "lit");
+        document.getElementById("d2").classList.add("roll", "lit");
         setTimeout(() => {
-          document.getElementById("d1").classList.remove("roll");
-          document.getElementById("d2").classList.remove("roll");
-        }, 400);
+          document.getElementById("d1").classList.remove("roll", "lit");
+          document.getElementById("d2").classList.remove("roll", "lit");
+        }, 500);
+
         if (isD) gs.dblCount = (gs.dblCount || 0) + 1;
         else gs.dblCount = 0;
         addLog(
           gs,
           `${p.name} tung ${v1}+${v2}=${v1 + v2}${isD ? " ✦ DOUBLE" : ""}`,
         );
+
         if (p.jail) {
           if (isD) {
             p.jail = false;
             p.jailTurns = 0;
             addLog(gs, `⚡ ${p.name} thoát ngục!`, true);
+            SFX.jailBreak(p.charId);
             doMove(gs, p, v1 + v2, false);
           } else {
             p.jailTurns = (p.jailTurns || 0) + 1;
@@ -1610,15 +2222,18 @@
               p.jail = false;
               p.jailTurns = 0;
               addLog(gs, `${p.name} nộp 50¥ thoát ngục.`);
+              SFX.jailBreak(p.charId);
               doMove(gs, p, v1 + v2, false);
             } else {
               addLog(gs, `${p.name} ở ngục (${p.jailTurns}/3).`);
+              SFX.jailStay();
               gs.hasRolled = true;
             }
           }
         } else {
           if ((gs.dblCount || 0) >= 3) {
             addLog(gs, `⚠ ${p.name} tung đôi 3 lần — vào tù!`, true);
+            SFX.tripleDouble();
             doGoJail(gs, p);
             gs.hasRolled = true;
           } else doMove(gs, p, v1 + v2, isD);
@@ -1634,7 +2249,7 @@
       function addLog(gs, t, hi = false) {
         gs.log = gs.log || [];
         gs.log.push({ t, hi });
-        if (gs.log.length > 40) gs.log.shift();
+        if (gs.log.length > 50) gs.log.shift();
       }
 
       function doMove(gs, p, steps, isD) {
@@ -1643,6 +2258,7 @@
         if (p.pos < old) {
           p.money += 200;
           addLog(gs, `✦ ${p.name} qua Xuất Phát +200¥!`, true);
+          SFX.goSpace(p.charId);
         }
         const cell = gs.cells[p.pos];
         addLog(gs, `→ ${cell.name}`);
@@ -1658,6 +2274,7 @@
         if (cell.type === "tax") {
           p.money -= cell.amount;
           addLog(gs, `${p.name} nộp thuế ${cell.amount}¥`, true);
+          SFX.tax();
           checkBk(gs, p);
           gs.hasRolled = true;
           if (isD) gs.hasRolled = false;
@@ -1668,22 +2285,24 @@
           gs.ccIdx++;
           p.money += card.a;
           addLog(gs, `卍 ${p.name}: ${card.t}`, true);
+          SFX.cardDraw();
+          setTimeout(() => {
+            card.a > 0 ? SFX.cardGood(p.charId) : SFX.cardBad();
+          }, 200);
           checkBk(gs, p);
           gs.hasRolled = true;
           if (isD) gs.hasRolled = false;
           return;
         }
-        if (
-          cell.type === "property" ||
-          cell.type === "railroad" ||
-          cell.type === "utility"
-        ) {
+        if (["property", "railroad", "utility"].includes(cell.type)) {
           if (cell.owner == null) {
             gs.hasRolled = true;
             if (isD) gs.hasRolled = false;
-            const pi = gs.players.indexOf(p);
-            const ci = gs.cells.indexOf(cell);
-            gs._pendingBuy = { pi, ci, isD };
+            gs._pendingBuy = {
+              pi: gs.players.indexOf(p),
+              ci: gs.cells.indexOf(cell),
+              isD,
+            };
             return;
           } else if (cell.owner !== gs.cur) {
             const rent = calcRent(gs, cell);
@@ -1691,6 +2310,9 @@
             p.money -= rent;
             owner.money += rent;
             addLog(gs, `${p.name} trả ${rent}¥ thuê cho ${owner.name}`, true);
+            /* Âm thanh: người chơi hiện tại trả, chủ nhận */
+            SFX.rentPay(p.charId);
+            setTimeout(() => SFX.rentGet(owner.charId), 150);
             checkBk(gs, p);
           }
         }
@@ -1724,9 +2346,7 @@
       }
 
       function doGoJail(gs, p) {
-        // Bật tiếng vào tù
-        sfxJail.play().catch((e) => console.log(e));
-
+        SFX.jail();
         p.pos = 10;
         p.jail = true;
         p.jailTurns = 0;
@@ -1737,6 +2357,7 @@
         if (p.money < 0) {
           p.bankrupt = true;
           addLog(gs, `✦ ${p.name} phá sản!`, true);
+          SFX.bankrupt();
           const pi = gs.players.indexOf(p);
           gs.cells.forEach((c) => {
             if (c.owner === pi) c.owner = null;
@@ -1772,9 +2393,7 @@
         buy.textContent = canBuy ? `Thu phục ${cell.price}¥` : "Thiếu lực";
         buy.disabled = !canBuy;
         buy.onclick = async () => {
-          // Bật tiếng mua đất
-          sfxBuy.play().catch((e) => console.log(e));
-
+          SFX.buy(p.charId);
           const gs2 = JSON.parse(JSON.stringify(gameState));
           gs2.players[pi].money -= cell.price;
           gs2.cells[ci].owner = pi;
@@ -1793,6 +2412,7 @@
         pass.className = "mbtn";
         pass.textContent = "Bỏ qua";
         pass.onclick = async () => {
+          SFX.pass();
           const gs2 = JSON.parse(JSON.stringify(gameState));
           delete gs2._pendingBuy;
           gs2.ts = Date.now();
@@ -1807,6 +2427,7 @@
 
       document.getElementById("endBtn").onclick = async () => {
         if (!isMyTurn() || !gameState.hasRolled) return;
+        SFX.click();
         const gs = JSON.parse(JSON.stringify(gameState));
         gs.hasRolled = false;
         gs.dblCount = 0;
@@ -1829,9 +2450,10 @@
         document.getElementById("wscr").style.display = "block";
         const w = gameState.players[gameState.winnerIdx];
         if (!w) return;
+        SFX.win(w.charId);
         const ch = getChar(w.charId);
         document.getElementById("wchar").innerHTML =
-          `<img src="${ch.image}" style="width:86px;height:86px;border-radius:50%;object-fit:cover;">`;
+          `<img src="${ch.image}" style="width:86px;height:86px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">`;
         document.getElementById("wname").textContent = w.name;
         document.getElementById("wmoney").textContent =
           w.money.toLocaleString() + "¥";
